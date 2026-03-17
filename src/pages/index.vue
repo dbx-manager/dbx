@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { invoke } from "@tauri-apps/api/core";
-import "./assets/styles/style.css";
-import TopBar from "./Component/TopBar.vue";
-
+import "../assets/styles/style.css";
+import Container from "./Container.vue";
 const greetMsg = ref("");
 const name = ref("");
 
@@ -12,12 +11,7 @@ async function greet() {
   greetMsg.value = await invoke("greet", { name: name.value });
 }
 </script>
-
 <template>
-  <v-app>
-    <top-bar />
-    <v-container class="max-w-full!">
-      <RouterView />
-    </v-container>
-  </v-app>
+
+    <Container />
 </template>

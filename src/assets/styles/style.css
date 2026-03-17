@@ -1,0 +1,13 @@
+@font-face {
+  font-family: "AdwaitaSans"; /* Choose a name for your font family */
+  src: url("../AdwaitaSans-Regular.ttf") format("truetype");
+  /* Add other formats (woff, woff2) for better browser support */
+  font-weight: normal;
+  font-style: normal;
+}
+@import "tailwindcss";
+*{font-family: "AdwaitaSans" ;}
+.topbarContainer button{
+    background-color: transparent;
+}
+@plugin "@tailwindcss/forms";

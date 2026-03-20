@@ -2,13 +2,77 @@
 import ContainerController from "./ContainerController.vue";
 import "../Functions/ListingContaienrs";
 import { list_containers } from "../Functions/ListingContaienrs";
-import { onMounted, ref } from "vue";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 import { ListContainer } from "../Types/ListContainer";
+import { useSettings } from "../composables/useSettings";
+
 const props = defineProps();
-const containerList=ref<ListContainer[]|null>(null);
+const containerList = ref<ListContainer[]|null>(null);
+const isLoading = ref(false);
+const updateError = ref<string | null>(null);
+let updateInterval: number | null = null;
+
+const { settings } = useSettings();
+
+// Function to fetch container list with error handling
+const fetchContainerList = async () => {
+  if (!settings.autoUpdateEnabled) return;
+  
+  try {
+    isLoading.value = true;
+    updateError.value = null;
+    const newList = await list_containers();
+    containerList.value = newList;
+  } catch (error) {
+    console.error('Failed to fetch container list:', error);
+    updateError.value = error instanceof Error ? error.message : 'Failed to fetch containers';
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Start the update interval
+const startUpdateInterval = () => {
+  if (updateInterval) {
+    clearInterval(updateInterval);
+  }
+  
+  if (settings.autoUpdateEnabled && settings.updateInterval > 0) {
+    updateInterval = setInterval(fetchContainerList, settings.updateInterval);
+  }
+};
+
+// Stop the update interval
+const stopUpdateInterval = () => {
+  if (updateInterval) {
+    clearInterval(updateInterval);
+    updateInterval = null;
+  }
+};
+
+// Watch for settings changes and update interval accordingly
+watch(() => settings.updateInterval, () => {
+  startUpdateInterval();
+});
+
+watch(() => settings.autoUpdateEnabled, (enabled) => {
+  if (enabled) {
+    startUpdateInterval();
+  } else {
+    stopUpdateInterval();
+  }
+});
+
 onMounted(async () => {
-  const x = await list_containers();
-  containerList.value = x;
+  // Initial fetch
+  await fetchContainerList();
+  
+  // Start polling
+  startUpdateInterval();
+});
+
+onUnmounted(() => {
+  stopUpdateInterval();
 });
 </script>
 

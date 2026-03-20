@@ -1,39 +1,61 @@
 use podman_api::models::ListContainer;
-use podman_api::opts::{ ContainerListOpts};
-use podman_api::Podman;
+use podman_api::opts::ContainerListOpts;
+use tokio::time::{interval, Duration};
 use std::sync::Arc;
-use tokio::sync::OnceCell;
+use tokio::sync::{OnceCell, RwLock}; // Added RwLock
 use crate::classes::socket::PodmanSocket;
 
-
 pub struct Containers {
-    //ListContainer represent a single contianer ("I know the name is missleading, that's how podman-api named it :> ")
-    pub data: Vec<ListContainer>,
+    // Wrapped in RwLock to allow async updates from the background task
+    // and concurrent reads from the rest of the app
+    pub data: RwLock<Vec<ListContainer>>,
 }
 
 static SINGLETON: OnceCell<Arc<Containers>> = OnceCell::const_new();
 
 impl Containers {
     async fn init() -> Arc<Containers> {
-        let mut data = Vec::new();
-        let fetched_item = self_fetch_data_async().await;
-        data = fetched_item.clone();
-        Arc::new(Containers { data })
+        let initial_data = self_fetch_data_async().await;
+        
+        let instance = Arc::new(Containers {
+            data: RwLock::new(initial_data),
+        });
+
+        // Clone the Arc for the background worker
+        let worker = Arc::clone(&instance);
+
+        tokio::spawn(async move {
+            let mut interval = interval(Duration::from_secs(5));
+            loop {
+                interval.tick().await;
+                
+                // Fetch new data independently
+                let new_data = self_fetch_data_async().await;
+                
+                // Lock briefly to swap the data
+                let mut data_lock = worker.data.write().await;
+                *data_lock = new_data;
+                // Lock drops here automatically
+            }
+        });
+
+        instance
     }
 
     pub async fn get_instance() -> Arc<Containers> {
         SINGLETON.get_or_init(Self::init).await.clone()
     }
+
+    // Helper to read data safely
+    pub async fn list_containers(&self) -> Vec<ListContainer> {
+        self.data.read().await.clone()
+    }
 }
 
-// TODO: add an auto checker if podman does exsist and automaticly run podman system service --time=0 unix:///tmp/podman.sock on app startup 
-//this is the "constructor" for the singleton
 async fn self_fetch_data_async() -> Vec<ListContainer> {
-    //keep the socket in /tmp/podman.sock so if the app was ran in the contaienr,it can use the host podman and not get lost
-    let podman =PodmanSocket::get_instance().await.socket.clone();
+    let podman = PodmanSocket::get_instance().await.socket.clone();
 
-    //stolen from the api as is :>
-    return podman
+    podman
         .containers()
         .list(
             &ContainerListOpts::builder()
@@ -41,6 +63,8 @@ async fn self_fetch_data_async() -> Vec<ListContainer> {
                 .build(),
         )
         .await
-        .unwrap();
+        .unwrap_or_else(|e| {
+            eprintln!("Failed to fetch containers: {}", e);
+            Vec::new() // Return empty vec on error instead of panicking
+        })
 }
-

@@ -3,6 +3,8 @@ use podman_api::opts::{ ContainerListOpts};
 use podman_api::Podman;
 use std::sync::Arc;
 use tokio::sync::OnceCell;
+use crate::classes::socket::PodmanSocket;
+
 
 pub struct Containers {
     //ListContainer represent a single contianer ("I know the name is missleading, that's how podman-api named it :> ")
@@ -28,7 +30,7 @@ impl Containers {
 //this is the "constructor" for the singleton
 async fn self_fetch_data_async() -> Vec<ListContainer> {
     //keep the socket in /tmp/podman.sock so if the app was ran in the contaienr,it can use the host podman and not get lost
-    let podman = Podman::unix("/tmp/podman.sock");
+    let podman =PodmanSocket::get_instance().await.socket.clone();
 
     //stolen from the api as is :>
     return podman

@@ -22,7 +22,7 @@ onMounted(async () => {
                   <v-icon color="#dadadaff" size="x-large" fill="white"  class=" pr-2">mdi-cube-outline</v-icon>
         <span class="text-white text-2xl font-light" v-if="container">{{ container.Names[0] }}</span>
       </div>
-      <container-controller v-if="container" :contianer-id="container.Id" :status="container.State"  />
+      <container-controller v-if="container" :containerId="container.Id" :status="container.State"  />
     </div>
     <div class="w-[80%]  grid grid-cols-2 grid-row-2  md:grid-cols-3 md:grid-rows-2 gap-2">
         <!-- TODO: make the exported app disappere when the screen is too small -->

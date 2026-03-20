@@ -7,11 +7,6 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[alias]
-run = "run /usr/bin/distrobox-host-exec" 
-
-
-
 [target.'cfg(target_os = "linux")']
 # mold, if you have GCC 12+
 rustflags = ["-C", "link-arg=-fuse-ld=mold"]

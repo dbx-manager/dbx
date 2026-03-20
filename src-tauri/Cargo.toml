@@ -7,6 +7,15 @@ edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[alias]
+run = "run /usr/bin/distrobox-host-exec" 
+
+
+
+[target.'cfg(target_os = "linux")']
+# mold, if you have GCC 12+
+rustflags = ["-C", "link-arg=-fuse-ld=mold"]
+
 [lib]
 # The `_lib` suffix may seem redundant but it is necessary
 # to make the lib name unique and wouldn't conflict with the bin name.
@@ -20,6 +29,7 @@ tauri-build = { version = "2", features = [] }
 [dependencies]
 tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+chrono = { version = "0.4", features = ["serde"] }
+podman-api = "0.11.0"
+tokio = { version = "1.0", features = ["full"] }
 

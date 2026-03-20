@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "tauri:dev": "WRAP_EXEC=1 tauri dev",
+    "tauri:dev:normal": "tauri dev"
   },
   "dependencies": {
     "@jamescoyle/vue-icon": "^0.1.2",
@@ -35,4 +37,5 @@
     "vite-plugin-vuetify": "^2.1.3",
     "vue-tsc": "^2.1.10"
   }
+  
 }

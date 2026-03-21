@@ -30,7 +30,7 @@ const toggleAutoUpdate = () => {
 <template>
   <div class="bg-[#2a2a2e] rounded-lg p-4 border border-[#3a3a3e]">
     <div class="flex flex-col gap-4">
-      <div class="flex flex-row justify-between items-center">
+      <div class="flex flex-row justify-between items-center gap-6">
         <h3 class="text-white text-lg font-semibold">Container Updates</h3>
         <v-btn
           :color="settings.autoUpdateEnabled ? '#188251ff' : '#9a2a2aff'"

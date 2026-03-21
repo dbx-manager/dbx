@@ -3,7 +3,6 @@ use crate::classes::socket::PodmanSocket;
 use podman_api::models::ListContainer;
 #[tauri::command]
 pub async fn get_container_list() -> Result<Vec<ListContainer>, String> {
-    // let instance = Containers::get_instance().await;
     Ok(Containers::get_instance().await.data.read().await.clone())
 }
 

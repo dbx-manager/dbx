@@ -2,12 +2,10 @@ use podman_api::models::ListContainer;
 use podman_api::opts::ContainerListOpts;
 use tokio::time::{interval, Duration};
 use std::sync::Arc;
-use tokio::sync::{OnceCell, RwLock}; // Added RwLock
+use tokio::sync::{OnceCell, RwLock}; 
 use crate::classes::socket::PodmanSocket;
 
 pub struct Containers {
-    // Wrapped in RwLock to allow async updates from the background task
-    // and concurrent reads from the rest of the app
     pub data: RwLock<Vec<ListContainer>>,
 }
 
@@ -21,7 +19,6 @@ impl Containers {
             data: RwLock::new(initial_data),
         });
 
-        // Clone the Arc for the background worker
         let worker = Arc::clone(&instance);
 
         tokio::spawn(async move {
@@ -29,13 +26,10 @@ impl Containers {
             loop {
                 interval.tick().await;
                 
-                // Fetch new data independently
                 let new_data = self_fetch_data_async().await;
                 
-                // Lock briefly to swap the data
                 let mut data_lock = worker.data.write().await;
                 *data_lock = new_data;
-                // Lock drops here automatically
             }
         });
 

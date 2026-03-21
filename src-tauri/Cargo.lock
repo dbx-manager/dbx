@@ -690,6 +690,7 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "podman-api",
+ "regex",
  "tauri",
  "tauri-build",
  "tauri-plugin-opener",

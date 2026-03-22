@@ -2,51 +2,37 @@ use podman_api::models::ListContainer;
 use podman_api::opts::ContainerListOpts;
 use tokio::time::{interval, Duration};
 use std::sync::Arc;
-use tokio::sync::{OnceCell, RwLock}; 
+use tokio::sync::RwLock; 
 use crate::classes::socket::PodmanSocket;
 
-pub struct Containers {
-    pub data: RwLock<Vec<ListContainer>>,
+// AppState structure for Tauri managed state
+pub struct ContainersState {
+    pub data: Arc<RwLock<Vec<ListContainer>>>,
 }
 
-static SINGLETON: OnceCell<Arc<Containers>> = OnceCell::const_new();
+impl ContainersState {
+    pub fn new() -> Self {
+        Self {
+            data: Arc::new(RwLock::new(Vec::new())),
+        }
+    }
+}
 
-impl Containers {
-    async fn init() -> Arc<Containers> {
-        let initial_data = self_fetch_data_async().await;
+// Background task function that updates container data
+pub async fn start_container_monitoring(containers_state: Arc<RwLock<Vec<ListContainer>>>) {
+    let mut interval = interval(Duration::from_secs(5));
+    loop {
+        interval.tick().await;
         
-        let instance = Arc::new(Containers {
-            data: RwLock::new(initial_data),
-        });
-
-        let worker = Arc::clone(&instance);
-
-        tokio::spawn(async move {
-            let mut interval = interval(Duration::from_secs(5));
-            loop {
-                interval.tick().await;
-                
-                let new_data = self_fetch_data_async().await;
-                
-                let mut data_lock = worker.data.write().await;
-                *data_lock = new_data;
-            }
-        });
-
-        instance
-    }
-
-    pub async fn get_instance() -> Arc<Containers> {
-        SINGLETON.get_or_init(Self::init).await.clone()
-    }
-
-    // Helper to read data safely
-    pub async fn list_containers(&self) -> Vec<ListContainer> {
-        self.data.read().await.clone()
+        let new_data = fetch_containers_data().await;
+        
+        let mut data_lock = containers_state.write().await;
+        *data_lock = new_data;
     }
 }
 
-async fn self_fetch_data_async() -> Vec<ListContainer> {
+// Helper function to fetch container data
+pub async fn fetch_containers_data() -> Vec<ListContainer> {
     let podman = PodmanSocket::get_instance().await.socket.clone();
 
     podman

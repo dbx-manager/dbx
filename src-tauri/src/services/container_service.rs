@@ -1,9 +1,12 @@
-use crate::classes::containers::Containers;
+use crate::classes::containers::ContainersState;
 use crate::classes::socket::PodmanSocket;
 use podman_api::models::ListContainer;
+use tauri::State;
+
 #[tauri::command]
-pub async fn get_container_list() -> Result<Vec<ListContainer>, String> {
-    Ok(Containers::get_instance().await.data.read().await.clone())
+pub async fn get_container_list(containers_state: State<'_, ContainersState>) -> Result<Vec<ListContainer>, String> {
+    let data = containers_state.data.read().await;
+    Ok(data.clone())
 }
 
 #[tauri::command]

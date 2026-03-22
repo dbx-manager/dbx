@@ -1,25 +1,34 @@
 use std::{collections::HashMap, fs, path::Path, sync::Arc};
-use tokio::sync::OnceCell;
+use tokio::sync::RwLock;
 
-pub struct ExportedAppsList {
-    pub apps: HashMap<String, Vec<String>>,
+// AppState structure for Tauri managed state
+pub struct ExportedAppsState {
+    pub data: Arc<RwLock<HashMap<String, Vec<String>>>>,
 }
 
-static SINGLE: OnceCell<Arc<ExportedAppsList>> = OnceCell::const_new();
-
-impl ExportedAppsList {
-    async fn init() -> Arc<ExportedAppsList> {
-        let data = self_fetch_data_async().await;
-        Arc::new(ExportedAppsList { apps: data })
-    }
-
-    pub async fn get_instance() -> Arc<ExportedAppsList> {
-        SINGLE.get_or_init(Self::init).await.clone()
+impl ExportedAppsState {
+    pub fn new() -> Self {
+        Self {
+            data: Arc::new(RwLock::new(HashMap::new())),
+        }
     }
 }
 
-//this is the "constructor" for the singleton
-async fn self_fetch_data_async() -> HashMap<String, Vec<String>> {
+// Background task function that updates exported apps data
+pub async fn start_exported_apps_monitoring(exported_apps_state: Arc<RwLock<HashMap<String, Vec<String>>>>) {
+    let mut interval = tokio::time::interval(tokio::time::Duration::from_secs(10));
+    loop {
+        interval.tick().await;
+        
+        let new_data = fetch_exported_apps_data().await;
+        
+        let mut data_lock = exported_apps_state.write().await;
+        *data_lock = new_data;
+    }
+}
+
+// Helper function to fetch exported apps data
+pub async fn fetch_exported_apps_data() -> HashMap<String, Vec<String>> {
     parse_distrobox_apps(Path::new("/home/ag/.local/share/applications"))
 }
 

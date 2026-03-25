@@ -1,4 +1,4 @@
-pub static  listappsScript:String ="#!/bin/bash
+pub static LIST_APPS_SCRIPT: &str = r#"#!/bin/bash
 
 if command -v apt &> /dev/null; then
     apt list --installed 2>/dev/null | cut -d'/' -f1
@@ -15,4 +15,4 @@ elif command -v apk &> /dev/null; then
 else
     echo 'No supported package manager found.'
     exit 1
-fi";
+fi"#;

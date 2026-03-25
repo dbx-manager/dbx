@@ -689,11 +689,14 @@ name = "dbx"
 version = "0.1.0"
 dependencies = [
  "chrono",
+ "futures-util",
  "podman-api",
  "regex",
+ "serde",
  "tauri",
  "tauri-build",
  "tauri-plugin-opener",
+ "tempfile",
  "tokio",
 ]
 

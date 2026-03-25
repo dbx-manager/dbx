@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import ExportedAppsPanel from "./ExportedAppsPanel.vue";
 import SystemAppsPanel from "./SystemAppsPanel.vue";
 import "../assets/styles/style.css";
@@ -12,13 +12,12 @@ const switchToB = () => (activePanel.value = "ExportedAppsPanel");
 const switchToA = () => (activePanel.value = "SystemAppsPanel");
 
 interface Props {
-    containerName: string;
-    exportedApps: string[];
+    container: ExportedApps;
 }
 defineProps<Props>();
 </script>
 <template>
-    <ContainerCard :containerName="containerName">
+    <ContainerCard :containerName="container.name">
         <div class="bg-[#212123]! rounded-lg px-4">
             <header
                 color="#222226"
@@ -48,10 +47,15 @@ defineProps<Props>();
             <div class="">
                 <div class="relative overflow-hidden rounded">
                     <ExportedAppsPanel
+                        class="overflow-scroll max-h-100"
                         v-if="activePanel === 'ExportedAppsPanel'"
-                        :AppsList="exportedApps"
+                        :AppsList="container.exported_apps"
                     />
-                    <SystemAppsPanel v-if="activePanel == 'SystemAppsPanel'" />
+                    <SystemAppsPanel
+                        class="overflow-scroll max-h-100"
+                        v-if="activePanel == 'SystemAppsPanel'"
+                        :container_id="container.id"
+                    />
                 </div>
             </div>
             <div class="flex gap-2 p-2 justify-end">

@@ -1,16 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import Appholder from "./Appholder.vue";
-import { get_exported_apps } from "../Functions/AppsService";
-const ExportedAppsList = ref([
-    "brave",
-    "chrome",
-    "inkscape",
-    "Gimp",
-    "systemd",
-    "soso Al Rakasa",
-    "what do you call a hoe?",
-]);
 interface Props {
     AppsList: String[];
 }

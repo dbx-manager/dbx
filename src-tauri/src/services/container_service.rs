@@ -1,5 +1,6 @@
 use crate::classes::containers::ContainersState;
 use crate::classes::socket::PodmanSocket;
+use crate::classes::system_apps::execute_script_in_container;
 use podman_api::models::ListContainer;
 use tauri::State;
 
@@ -36,8 +37,10 @@ pub async fn pause_container(id: String) -> Result<(), String>{
 #[tauri::command]
 pub async fn unpause_container(id: String) -> Result<(), String>{
     let podman = PodmanSocket::get_instance().await.socket.clone();
-    if let Err(e) = podman.containers().get(id).unpause().await {
-        eprintln!("{}", e);
-    }
+    // if let Err(e) = podman.containers().get(id).unpause().await {
+    //     eprintln!("{}", e);
+    // }
+        execute_script_in_container(id).await;
+
     Ok(())
 }

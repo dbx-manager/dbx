@@ -1,17 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import Appholder from "./Appholder.vue";
-import { get_system_apps } from "../Functions/AppsService";
+import Appholder from "../Appholder.vue";
+import { get_system_apps } from "../../Functions/AppsService";
 import { onMounted } from "vue";
-const SystemPackagesList = ref([
-    "brave",
-    "chrome",
-    "inkscape",
-    "Gimp",
-    "systemd",
-    "soso Al Rakasa",
-    "what do you call a hoe?",
-]);
 interface props {
     container_id: string;
 }

@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import ExportedAppsPanel from "./ExportedAppsPanel.vue";
-import SystemAppsPanel from "./SystemAppsPanel.vue";
+import ExportedAppsPanel from "./panels/ExportedAppsPanel.vue";
+import SystemAppsPanel from "./panels/SystemAppsPanel.vue";
 import "../assets/styles/style.css";
-import ContainerCard from "./ContainerCard.vue";
+import ContainerCard from "./container/ContainerCard.vue";
 
 const activePanel = ref<"ExportedAppsPanel" | "SystemAppsPanel">(
     "ExportedAppsPanel",
 );
-const switchToB = () => (activePanel.value = "ExportedAppsPanel");
-const switchToA = () => (activePanel.value = "SystemAppsPanel");
+const switchToExportedAppsPanel = () =>
+    (activePanel.value = "ExportedAppsPanel");
+const switchToSystemAppsPanel = () => (activePanel.value = "SystemAppsPanel");
 
 interface Props {
     container: ExportedApps;
@@ -25,7 +26,7 @@ defineProps<Props>();
             >
                 <v-btn
                     variant="text"
-                    @click="switchToB"
+                    @click="switchToExportedAppsPanel"
                     text="Exported Apps"
                     class="text-[16px]! py-5! rounded-lg"
                     :class="{
@@ -35,7 +36,7 @@ defineProps<Props>();
                 />
                 <v-btn
                     variant="text"
-                    @click="switchToA"
+                    @click="switchToSystemAppsPanel"
                     text="Syatem Apps"
                     class="text-[16px]! py-5! rounded-lg"
                     :class="{

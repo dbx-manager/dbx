@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Appholder from "./Appholder.vue";
+import Appholder from "../Appholder.vue";
 interface Props {
     AppsList: String[];
 }

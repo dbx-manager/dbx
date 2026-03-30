@@ -1,11 +1,14 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from "vue";
+import { settings } from "../Functions/FechingContainersWithRefresh";
+import { useSettings } from "../composables/useSettings";
+import { formatCronToTime, formatCronToDate } from "../utils/cronUtils";
 
 const SelectedItem = ref("Daily");
 const pickerContainer = ref(null);
 const TimeVisibility = ref(true);
 const DateVisibility = ref(true);
-const items = ["Daily", "Weekly", "Monthly", "Yearly"];
+const items = ["Daily", "Weekly", "Monthly"];
 const handleClickOutside = (event) => {
     if (
         pickerContainer.value &&
@@ -23,13 +26,13 @@ onMounted(() => {
 onUnmounted(() => {
     document.removeEventListener("click", handleClickOutside);
 });
-</script>
-<script>
+// Date Constraints (Days 1-28 only)
+// We set min/max to a specific month/year to prevent navigation
 const onDateSelect = (selectedDate) => {
     const day = selectedDate.getDate();
 };
-// Date Constraints (Days 1-28 only)
-// We set min/max to a specific month/year to prevent navigation
+</script>
+<script>
 const currentYear = new Date().getFullYear();
 const currentMonth = new Date().getMonth(); // 0-indexed
 
@@ -78,21 +81,31 @@ const allowedMonthes = (date) => {
         <label class="text-sm">At:</label>
         <div class="flex justify-center">
             <v-btn
+            flat
+            
+             color="#22222698"
                 @Click="
                     {
                         TimeVisibility = !TimeVisibility;
                         DateVisibility = true;
                     }
                 "
-            >
-            </v-btn>
+            :text="formatCronToTime(settings.cronSchedule)"    
+            
+                />
+            
             <v-time-picker
                 :hidden="TimeVisibility"
+                rounded="lg"
                 class="absolute z-50 mt-10"
             />
         </div>
         <div class="flex justify-center">
             <v-btn
+            flat
+             color="#22222698"
+            :text="formatCronToDate(settings.cronSchedule)"    
+            :hidden="SelectedItem.match('Monthly')==null"
                 @Click="
                     {
                         DateVisibility = !DateVisibility;

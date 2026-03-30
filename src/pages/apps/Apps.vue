@@ -7,7 +7,6 @@ const props = defineProps();
 const containerList = ref<ExportedApps[] | null>(null);
 const fech_exported_app = async () => {
     containerList.value = await get_exported_apps();
-    console.log(containerList.value);
 };
 fech_exported_app();
 </script>

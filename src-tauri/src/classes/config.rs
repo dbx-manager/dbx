@@ -94,6 +94,23 @@ impl ConfigState {
         config_dir.push("backup.conf");
         config_dir
     }
+
+    pub fn update_backup_config(&self, new_config: &BackupConfig) -> Result<(), Box<dyn std::error::Error>> {
+        let user_config_path = Self::get_user_config_path();
+        
+        // Create parent directory if it doesn't exist
+        if let Some(parent) = user_config_path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        
+        // Serialize the config to JSON
+        let config_json = serde_json::to_string_pretty(new_config)?;
+        
+        // Write the config to the user config file
+        fs::write(&user_config_path, config_json)?;
+        
+        Ok(())
+    }
 }
 
 // Background task function that monitors config file changes

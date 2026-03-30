@@ -15,12 +15,18 @@ pub async fn update_backup_config(
     new_config: BackupConfig,
     app_handle: tauri::AppHandle,
 ) -> Result<(), String> {
+    // Update the in-memory config state
     let mut config_lock = config_state.data.write().await;
     *config_lock = new_config.clone();
+    
+    // Persist the config to the user config file
+    if let Err(e) = config_state.update_backup_config(&new_config) {
+        return Err(format!("Failed to save config to file: {}", e));
+    }
     
     // Emit event to notify frontend of config change
     app_handle.emit("config-updated", &new_config)
         .map_err(|e| format!("Failed to emit config update event: {}", e))?;
-    
+
     Ok(())
 }

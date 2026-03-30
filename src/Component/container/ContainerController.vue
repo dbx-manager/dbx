@@ -31,16 +31,10 @@ defineProps<Props>();
         flat
         class=""
     ></v-btn>
-    <span
-        class="flex flex-col"
-        :class="{
-            'text-green-600': status.match('running'),
-            'text-red': !status.match('running'),
-        }"
-        v-if="status"
-    >
-        {{ status }}</span
-    >
+    <span class="flex flex-col row-span-2 items-center">
+        Auto Start
+        <v-switch  flat inset color="success" :model-value="autoBackup" hide-details/>
+    </span>
     <v-btn
         text="Pause"
         color="#6c1882ff"
@@ -57,10 +51,6 @@ defineProps<Props>();
         flat
         class=""
     />
-    <span class="flex flex-col items-center">
-        Auto Start
-        <v-switch  flat inset color="success" :model-value="autoBackup"/>
-    </span>
 
         
 

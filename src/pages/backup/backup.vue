@@ -4,7 +4,9 @@ import KeepCounter from "../../Component/KeepCounter.vue";
 import TextInputWithLable from "../../Component/TextInputWithLable.vue";
 import SchedualDropDown from "../../Component/SchedualDropDown.vue";
 import BackupContainerWithController from "../../Component/BackupContainerWithController.vue";
+import { settings } from "../../Functions/FechingContainersWithRefresh";
 defineProps();
+
 </script>
 <template>
     <div class="flex flex-col gap-5">
@@ -13,7 +15,7 @@ defineProps();
         >
             <v-row dense>
                 <div class="grid grid-row-2 pl-4 py-4 w-fit! gap-x-4 gap-2">
-                    <TextInputWithLable lable="Location :" />
+                    <TextInputWithLable lable="Location :" :inputValue="settings.exportPath"  />
                     <div class="flex flex-row gap-4">
                         <SchedualDropDown />
                         <keep-counter />
@@ -33,6 +35,6 @@ defineProps();
                 </div>
             </v-row>
         </v-container>
-        <BackupContainerWithController></BackupContainerWithController>
+        <BackupContainerWithController/>
     </div>
 </template>

@@ -14,8 +14,8 @@ defineProps();
             class="bg-[#333337] pa-0 flex rounded-lg max-w-full! text-[#b8b8b8ff] gap-3 justify-start"
         >
             <v-row dense>
-                <div class="grid grid-row-2 pl-4 py-4 w-fit! gap-x-4 gap-2">
-                    <TextInputWithLable lable="Location :" :inputValue="settings.exportPath"  />
+                <div class="grid grid-row-2 pl-4 py-4 w-fit! gap-x-4 gap-2 text-sm">
+                    <TextInputWithLable lable="Location :" :inputValue="settings.backupLocationPath"  />
                     <div class="flex flex-row gap-4">
                         <SchedualDropDown />
                         <keep-counter />
@@ -29,8 +29,10 @@ defineProps();
                     <TextInputWithLable
                         class="col-span-2"
                         lable="Shared Package Cache:"
+                        :inputValue="settings.packageCachePath"
                     />
-                    <span>Totla Backups Size: 15G</span>
+                    <!-- TODO :add the size collection -->
+                    <span>Totla Backups Size: </span>
                     <span>Totla Package Cache size: 3G</span>
                 </div>
             </v-row>

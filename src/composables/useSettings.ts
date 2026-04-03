@@ -5,24 +5,27 @@ import { UnlistenFn } from '@tauri-apps/api/event';
 
 interface BackendBackupConfig {
   containers: string[];
-  export_path: string;
+  backup_location_path: string;
   cron_schedule: string | null;
+  package_cache_path: string;
 }
 
 interface AppSettings {
   updateInterval: number; // in milliseconds
   autoUpdateEnabled: boolean;
   containers: string[];
-  exportPath: string;
   cronSchedule: string | null;
+  packageCachePath: string;
+  backupLocationPath: string;
 }
 
 const defaultSettings: AppSettings = {
   updateInterval: 5000, // 5 seconds default
   autoUpdateEnabled: true,
   containers: [],
-  exportPath: '/home/user/dbx-backup/containers',
-  cronSchedule: null
+  cronSchedule: null,
+  packageCachePath: '/home/user/.cache/dbx/',
+  backupLocationPath: '/home/user/dbx-backup/'
 };
 
 // Load settings from localStorage or use defaults
@@ -35,8 +38,9 @@ const loadSettings = (): AppSettings => {
         updateInterval: parsed.updateInterval || defaultSettings.updateInterval,
         autoUpdateEnabled: parsed.autoUpdateEnabled !== undefined ? parsed.autoUpdateEnabled : defaultSettings.autoUpdateEnabled,
         containers: parsed.containers || defaultSettings.containers,
-        exportPath: parsed.exportPath || defaultSettings.exportPath,
-        cronSchedule: parsed.cronSchedule !== undefined ? parsed.cronSchedule : defaultSettings.cronSchedule
+        cronSchedule: parsed.cronSchedule !== undefined ? parsed.cronSchedule : defaultSettings.cronSchedule,
+        packageCachePath: parsed.packageCachePath || defaultSettings.packageCachePath,
+        backupLocationPath: parsed.backupLocationPath || defaultSettings.backupLocationPath
       };
     }
   } catch (error) {
@@ -65,8 +69,9 @@ export function useSettings() {
       settings.value = {
         ...settings.value,
         containers: backendConfig.containers || settings.value.containers,
-        exportPath: backendConfig.export_path || settings.value.exportPath,
-        cronSchedule: backendConfig.cron_schedule || settings.value.cronSchedule
+        cronSchedule: backendConfig.cron_schedule || settings.value.cronSchedule,
+        packageCachePath: backendConfig.package_cache_path || settings.value.packageCachePath,
+        backupLocationPath: backendConfig.backup_location_path || settings.value.backupLocationPath
       };
     } catch (error) {
       console.warn('Failed to load config from backend, using localStorage defaults:', error);
@@ -85,8 +90,9 @@ export function useSettings() {
         settings.value = {
           ...settings.value,
           containers: newConfig.containers || settings.value.containers,
-          exportPath: newConfig.export_path || settings.value.exportPath,
-          cronSchedule: newConfig.cron_schedule || settings.value.cronSchedule
+          cronSchedule: newConfig.cron_schedule || settings.value.cronSchedule,
+          packageCachePath: newConfig.package_cache_path || settings.value.packageCachePath,
+          backupLocationPath: newConfig.backup_location_path || settings.value.backupLocationPath
         };
       }
     });
@@ -125,14 +131,22 @@ export function useSettings() {
     syncToBackend();
   };
 
-  const setExportPath = (path: string) => {
-    settings.value.exportPath = path;
+ 
+
+  const setCronSchedule = (schedule: string | null) => {
+    settings.value.cronSchedule = schedule;
     // Sync to backend
     syncToBackend();
   };
 
-  const setCronSchedule = (schedule: string | null) => {
-    settings.value.cronSchedule = schedule;
+  const setPackageCachePath = (path: string) => {
+    settings.value.packageCachePath = path;
+    // Sync to backend
+    syncToBackend();
+  };
+
+  const setBackupLocationPath = (path: string) => {
+    settings.value.backupLocationPath = path;
     // Sync to backend
     syncToBackend();
   };
@@ -149,8 +163,9 @@ export function useSettings() {
       await invoke('update_backup_config', {
         newConfig: {
           containers: settings.value.containers,
-          export_path: settings.value.exportPath,
-          cron_schedule: settings.value.cronSchedule
+          cron_schedule: settings.value.cronSchedule,
+          package_cache_path: settings.value.packageCachePath,
+          backup_location_path: settings.value.backupLocationPath
         }
       });
     } catch (error) {
@@ -171,8 +186,9 @@ export function useSettings() {
     setUpdateInterval,
     setAutoUpdateEnabled,
     setContainers,
-    setExportPath,
     setCronSchedule,
+    setPackageCachePath,
+    setBackupLocationPath,
     resetToDefaults,
     cleanup
   };

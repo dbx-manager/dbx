@@ -3,7 +3,7 @@ import { listen } from "@tauri-apps/api/event";
 
 export interface BackupConfig {
   containers: string[];
-  export_path: string;
+  backup_location_path: string;
   cron_schedule: string;
 }
 

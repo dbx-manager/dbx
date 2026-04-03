@@ -1,10 +1,19 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import "../assets/styles/style.css";
+import { invoke } from "@tauri-apps/api/core";
+
 import ContainerWithStatus from "../Component/container/ContainerWithStatus.vue";
 import ButtonSettingsPopUp from "../Component/ButtonSettingsPopUp.vue";
 defineProps();
 const settignsVisability = ref<boolean>(false);
+</script>
+<script lang="ts">
+//test function
+async function list() {
+    // console.log(await invoke("get_package_cache_size"));
+     
+}
 </script>
 <template>
     <v-container class="max-w-full! space-y-3">
@@ -16,6 +25,7 @@ const settignsVisability = ref<boolean>(false);
                     density="default"
                     color="#3584e4ff"
                     class="rounded-md"
+                    @Click="list"
                     ><span class="text-lg font-bold"
                         >New Container
                     </span></v-btn

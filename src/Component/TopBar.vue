@@ -24,17 +24,19 @@ const switchToBackup = () => (activePanel.value = "BackupPanel");
     <v-container class="flex justify-center space-x-0.5 topbarContainer py-1.5!">
       <router-link to="/" class="rounded-lg" :class="{ 'bg-[#38383bff]': activePanel == 'ContainerPanel' }">
         <v-btn variant="text" size="large" @click="switchToContainer">
-          <v-icon color="#dadadaff" size="large" fill="white"  class=" pr-2">mdi-cube-outline</v-icon>
+          <v-icon color="#dadadaff" size="large" fill="white" class=" pr-2" :icon="activePanel == 'ContainerPanel' ?'mdi-cube':'mdi-cube-outline'"></v-icon>
           <span class="text-lg">Container</span></v-btn>
       </router-link>
       <router-link to="/apps" class="rounded-lg" :class="{ 'bg-[#38383bff]': activePanel == 'AppsPanel' }">
         <v-btn variant="text" href="/apps" size="large" @click="switchToApps">
-          <v-icon color="#dadadaff" size="large" class=" pr-2">mdi-apps</v-icon><span
+          <v-icon color="#dadadaff" size="large" class=" pr-2"
+            :icon="activePanel == 'AppsPanel' ? 'mdi-view-grid-plus' : 'mdi-view-grid-plus-outline'" /><span
             class="text-lg">Apps</span></v-btn>
+
       </router-link>
       <router-link to="/backup" class="rounded-lg" :class="{ 'bg-[#38383bff]': activePanel == 'BackupPanel' }">
         <v-btn variant="text" href="/backup" size="large" @click="switchToBackup">
-          <v-icon color="#dadadaff" size="large" class="  pr-2"> mdi-history</v-icon>
+          <v-icon color="#dadadaff" size="large" class="pr-2"> mdi-history </v-icon>
           <span class="text-lg">Backup</span></v-btn>
       </router-link>
     </v-container>

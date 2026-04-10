@@ -6,6 +6,7 @@ use std::sync::{Arc, RwLock};
 // AppState structure for Tauri managed state
 
 pub struct SystemAppsState {
+    // example [contianername1:[container1-system-apps],contianername2:[container2-system-apps]] 
     pub data: Arc<RwLock<HashMap<String, Vec<String>>>>,
 }
 

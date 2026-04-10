@@ -7,7 +7,11 @@ defineProps<Props>();
 </script>
 
 <template>
-    <ul class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5">
-        <appholder v-for="item in AppsList" :app-info="item" selection-box />
-    </ul>
+    <div class="flex justify-center pt-2">
+        <v-virtual-scroll class="h-full!"  v-if="AppsList != null"  :items="AppsList" >
+            <template v-slot:default="{ item }" >
+                <appholder :app-info="item" selection-box />        
+            </template>
+        </v-virtual-scroll>
+    </div>
 </template>

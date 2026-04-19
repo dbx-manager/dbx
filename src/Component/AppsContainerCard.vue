@@ -4,7 +4,6 @@ import ExportedAppsPanel from "./panels/ExportedAppsPanel.vue";
 import SystemAppsPanel from "./panels/SystemAppsPanel.vue";
 import "../assets/styles/style.css";
 import ContainerCard from "./container/ContainerCard.vue";
-
 const activePanel = ref<"ExportedAppsPanel" | "SystemAppsPanel">(
     "ExportedAppsPanel",
 );
@@ -18,8 +17,8 @@ interface Props {
 defineProps<Props>();
 </script>
 <template>
-    <ContainerCard :containerName="container.name">
-        <div class="bg-[#212123]! rounded-lg px-4">
+    <ContainerCard :containerName="container.name" >
+        <div  class="bg-[#212123]! rounded-lg px-4">
             <header
                 color="#222226"
                 class="toolbar flex justify-center gap-2 pt-3"
@@ -45,7 +44,7 @@ defineProps<Props>();
                     }"
                 />
             </header>
-            <div class="">
+            <div class="py-2">
                 <div class="relative overflow-hidden rounded">
                     <ExportedAppsPanel
                         class="overflow-scroll max-h-100"

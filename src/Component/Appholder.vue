@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+
 interface Props {
     appInfo: String;
     iconUrl?: string;
@@ -11,12 +13,12 @@ const props = withDefaults(defineProps<Props>(), {
     iconUrl: "",
     systemAppIcon: false
 });
-
+const selected=ref<boolean>(false)
 </script>
 
 <template>
-    <li class="flex flex-row items-center gap-2">
-        <input type="checkbox" v-if="selectionBox"
+    <li class="flex flex-row items-center gap-2" @click="selected=!selected">
+        <input type="checkbox" v-if="selectionBox" :checked="selected"
             class="w-5 h-5 z-10 bg-transparent! rounded-sm! forced-colors:appearance-auto border border-blue-700! focus:ring-1 focus:ring-offset-0! focus:outline-none!" />
 
         <v-icon color="#dadadaff" :icon="systemAppIcon ? 'mdi-application-cog-outline' : 'mdi-view-grid-outline'" />

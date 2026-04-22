@@ -1,11 +1,12 @@
-mod classes;
+mod structs;
 mod scripts;
+mod controllers;
 mod services;
-use crate::classes::config::{start_config_monitoring, ConfigState};
+use crate::controllers::config_controller::start_config_monitoring;
+use crate::controllers::containers_controller::start_container_monitoring;
+use crate::structs::config::{ ConfigState};
 use crate::services::config_service::*;
-use crate::classes::containers::{start_container_monitoring, ContainersState};
-use crate::classes::exported_apps::{start_exported_apps_monitoring, ExportedAppsState};
-use crate::classes::system_apps::SystemAppsState;
+use crate::structs::container::{ContainerList};
 use crate::services::apps_service::*;
 use crate::services::container_service::*;
 
@@ -13,29 +14,17 @@ use crate::services::container_service::*;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub async fn run() {
     // Create the containers state
-    let containers_state = ContainersState::new();
-    let containers_state_clone = containers_state.data.clone();
+    let containers_state = ContainerList::new().await;
+    let containers_state_clone = containers_state.clone();
 
-    // Create the exported apps state
-    let exported_apps_state = ExportedAppsState::new();
-    let exported_apps_state_clone = exported_apps_state.data.clone();
-
-    // Create the system apps state
-    let system_apps_state = SystemAppsState::new();
-    // let system_apps_state_clone = system_apps_state.data.clone();
-
-    // Create the config state
     let config_state = ConfigState::new();
-    let config_state_clone = config_state.data.clone();
+    let config_state_clone = config_state.clone();
 
     // Start the background monitoring tasks
     tokio::spawn(async move {
         start_container_monitoring(containers_state_clone).await;
     });
 
-    tokio::spawn(async move {
-        start_exported_apps_monitoring(exported_apps_state_clone).await;
-    });
 
     tokio::spawn(async move {
         start_config_monitoring(config_state_clone).await;
@@ -44,8 +33,6 @@ pub async fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .manage(containers_state)
-        .manage(exported_apps_state)
-        .manage(system_apps_state)
         .manage(config_state)
         .invoke_handler(tauri::generate_handler![
             get_container_list,

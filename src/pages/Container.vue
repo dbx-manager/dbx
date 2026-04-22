@@ -11,11 +11,11 @@ const newContainerDialog = ref<boolean>(false);
 </script>
 
 <template>
-    
+
     <v-container class="max-w-full! space-y-3">
         <div class="w-full flex flex-col md:flex-row justify-between gap-4">
             <div class="flex-1">
-                
+
                 <NewContainerPanel :dialog="newContainerDialog" />
             </div>
             <div class="w-full transition-opacity" v-if="settignsVisability">

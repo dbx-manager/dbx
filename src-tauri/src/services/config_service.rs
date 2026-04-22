@@ -1,53 +1,11 @@
-use crate::classes::config::{BackupConfig, ConfigState};
+use crate::{
+    controllers::config_controller::set_backup_config,
+    structs::config::{BackupConfig, ConfigState, DirectoryListInfo, DirectorySizeInfo, FileInfo},
+};
 use fs_extra::dir::get_size;
-use serde::Serialize;
 use std::fs;
 use tauri::Emitter;
 
-// Response structs
-#[derive(Debug, Serialize)]
-pub struct DirectorySizeInfo {
-    pub path: String,
-    pub size_bytes: u64,
-    pub size_human: String,
-}
-
-#[derive(Debug, Serialize)]
-pub struct FileInfo {
-    pub name: String,
-    pub path: String,
-    pub size_bytes: u64,
-    pub is_dir: bool,
-}
-
-#[derive(Debug, Serialize)]
-pub struct DirectoryListInfo {
-    pub path: String,
-    pub files: Vec<FileInfo>,
-    pub total_size_bytes: u64,
-}
-
-// Helper function to format bytes to human readable size
-fn format_bytes(bytes: u64) -> String {
-    const KB: u64 = 1024;
-    const MB: u64 = KB * 1024;
-    const GB: u64 = MB * 1024;
-    const TB: u64 = GB * 1024;
-
-    if bytes >= TB {
-        format!("{:.2} TB", bytes as f64 / TB as f64)
-    } else if bytes >= GB {
-        format!("{:.2} GB", bytes as f64 / GB as f64)
-    } else if bytes >= MB {
-        format!("{:.2} MB", bytes as f64 / MB as f64)
-    } else if bytes >= KB {
-        format!("{:.2} KB", bytes as f64 / KB as f64)
-    } else {
-        format!("{} B", bytes)
-    }
-}
-
-// Add these functions to expose config to frontend
 #[tauri::command]
 pub async fn get_backup_config(
     config_state: tauri::State<'_, ConfigState>,
@@ -67,7 +25,7 @@ pub async fn update_backup_config(
     *config_lock = new_config.clone();
 
     // Persist the config to the user config file
-    if let Err(e) = config_state.update_backup_config(&new_config) {
+    if let Err(e) = set_backup_config(&new_config) {
         return Err(format!("Failed to save config to file: {}", e));
     }
 
@@ -94,7 +52,6 @@ pub async fn get_package_cache_size(
         size_human: format_bytes(size_bytes),
     })
 }
-
 #[tauri::command]
 pub async fn get_backup_directory_list(
     config_state: tauri::State<'_, ConfigState>,
@@ -144,4 +101,24 @@ pub async fn get_backup_directory_list(
         files,
         total_size_bytes,
     })
+}
+
+// Helper function to format bytes to human readable size
+fn format_bytes(bytes: u64) -> String {
+    const KB: u64 = 1024;
+    const MB: u64 = KB * 1024;
+    const GB: u64 = MB * 1024;
+    const TB: u64 = GB * 1024;
+
+    if bytes >= TB {
+        format!("{:.2} TB", bytes as f64 / TB as f64)
+    } else if bytes >= GB {
+        format!("{:.2} GB", bytes as f64 / GB as f64)
+    } else if bytes >= MB {
+        format!("{:.2} MB", bytes as f64 / MB as f64)
+    } else if bytes >= KB {
+        format!("{:.2} KB", bytes as f64 / KB as f64)
+    } else {
+        format!("{} B", bytes)
+    }
 }

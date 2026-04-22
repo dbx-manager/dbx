@@ -10,7 +10,7 @@ interface BackendBackupConfig {
   package_cache_path: string;
 }
 
-interface AppSettings {
+export interface AppSettings {
   updateInterval: number; // in milliseconds
   autoUpdateEnabled: boolean;
   containers: string[];

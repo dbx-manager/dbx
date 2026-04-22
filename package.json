@@ -19,6 +19,7 @@
     "@tailwindcss/vite": "^4.2.1",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2",
+    "pinia": "^3.0.4",
     "roboto-fontface": "^0.10.0",
     "tailwindcss": "^4.2.1",
     "unplugin-vue-router": "^0.19.2",

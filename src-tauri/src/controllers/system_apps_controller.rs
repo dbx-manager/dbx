@@ -1,56 +1,30 @@
 use crate::scripts::list_apps::LIST_APPS_SCRIPT;
+use crate::structs::container::ContainerList;
+use crate::structs::socket::PodmanSocket;
 use futures_util::StreamExt;
-use std::collections::HashMap;
-use std::sync::{Arc, RwLock};
+use tauri::State;
 
-// AppState structure for Tauri managed state
-
-pub struct SystemAppsState {
-    // example [contianername1:[container1-system-apps],contianername2:[container2-system-apps]] 
-    pub data: Arc<RwLock<HashMap<String, Vec<String>>>>,
-}
-
-impl SystemAppsState {
-    pub fn new() -> Self {
-        Self {
-            data: Arc::new(RwLock::new(HashMap::new())),
-        }
-    }
-    pub async fn get_or_insert(&self, container_id: String) -> Vec<String> {
-        // Try read lock first
-        {
-            let read_guard = self.data.read().unwrap();
-            if let Some(value) = read_guard.get(&container_id) {
-                return value.clone();
-            }
-        }
-
-        // If not found, perform the async operation without holding any lock
-        let value = execute_script_in_container(container_id.clone()).await;
-        let apps = value.unwrap();
-
-        // Now acquire write lock to insert the result
-        let mut write_guard = self.data.write().unwrap();
-        
-        // Double-check after acquiring write lock (avoid race condition)
-        if let Some(existing_value) = write_guard.get(&container_id) {
-            return existing_value.clone();
-        }
-
-        write_guard.insert(container_id.to_string(), apps.clone());
-        apps
-    }
-}
-// Function to execute the script in a container using podman-api
-pub async fn execute_script_in_container(container_id: String) -> Result<Vec<String>, ()> {
+// Function to execute the script fetch system packages in a container using podman-api
+pub async fn parse_container_system_packages(
+    container_id: String,
+    state: State<'_, ContainerList>,
+) -> Result<bool, String> {
+    let container_list = state.containers.read().await;
+    let container = container_list
+        .values()
+        .find(|c| c.id == Some(container_id.clone()))
+        .unwrap();
+    let container_key = match &container.name {
+        Some(name) => name.clone(),
+        None => return Err(String::from("container has no name")),
+    };
+    drop(container_list);
     // Get the Podman instance
-    let podman = crate::classes::socket::PodmanSocket::get_instance()
-        .await
-        .socket
-        .clone();
+    let podman = PodmanSocket::get_instance().await.socket.clone();
+
     let container = podman.containers().get(container_id);
     //TODO: add error checking and error handiling
-    container
+    let _=container
         .copy_file_into("/tmp/dbx_system_apps_script", LIST_APPS_SCRIPT.as_bytes())
         .await;
     let chmodexec = container
@@ -95,13 +69,20 @@ pub async fn execute_script_in_container(container_id: String) -> Result<Vec<Str
     //         String::from_utf8(chunk.unwrap().to_ascii_lowercase()).unwrap()
     //     );
     // }
-    let mut chunks :String=String::new();
+    let mut chunks: String = String::new();
 
-while let Some(result) = scriptstream.next().await {
-    let chunk = result.unwrap();
-    let text = String::from_utf8(chunk.to_ascii_lowercase()).unwrap();
-    chunks+=text.as_str();
-}
+    while let Some(result) = scriptstream.next().await {
+        let chunk = result.unwrap();
+        let text = String::from_utf8(chunk.to_ascii_lowercase()).unwrap();
+        chunks += text.as_str();
+    }
+    let system_packeges: Vec<String> = chunks.lines().map(|s| s.to_string()).collect();
+    let mut write_state = state.containers.write().await;
 
-    Ok(chunks.lines().map(|s| s.to_string()).collect())
+    if let Some(container) = write_state.get_mut(&container_key) {
+        container.system_apps = Some(system_packeges.clone());
+    }
+
+    Ok(true)
+    // Ok(chunks.lines().map(|s| s.to_string()).collect())
 }

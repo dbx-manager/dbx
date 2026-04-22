@@ -4,6 +4,7 @@ import ExportedAppsPanel from "./panels/ExportedAppsPanel.vue";
 import SystemAppsPanel from "./panels/SystemAppsPanel.vue";
 import "../assets/styles/style.css";
 import ContainerCard from "./container/ContainerCard.vue";
+import { Container } from "../types/ListContainer";
 const activePanel = ref<"ExportedAppsPanel" | "SystemAppsPanel">(
     "ExportedAppsPanel",
 );
@@ -12,9 +13,9 @@ const switchToExportedAppsPanel = () =>
 const switchToSystemAppsPanel = () => (activePanel.value = "SystemAppsPanel");
 
 interface Props {
-    container: ExportedApps;
+    container: Container;
 }
-defineProps<Props>();
+const props = defineProps<Props>();
 </script>
 <template>
     <ContainerCard :containerName="container.name" >
@@ -54,7 +55,7 @@ defineProps<Props>();
                     <SystemAppsPanel
                         class="overflow-scroll max-h-100"
                         v-if="activePanel == 'SystemAppsPanel'"
-                        :container_id="container.id"
+                        :container_id="container.id" :systemAppList="container.system_apps"
                     />
                 </div>
             </div>

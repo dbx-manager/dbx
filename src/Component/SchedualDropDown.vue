@@ -1,15 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
-import { settings } from "../Functions/FechingContainersWithRefresh";
-import { useSettings } from "../composables/useSettings";
 import { formatCronToTime, formatCronToDate } from "../utils/cronUtils";
+import { AppSettings } from "../composables/useSettings";
 
-const SelectedItem = ref("Daily");
-const pickerContainer = ref(null);
-const TimeVisibility = ref(true);
-const DateVisibility = ref(true);
+const SelectedItem = ref<string>("Daily");
+const pickerContainer = ref<any>(null);
+const TimeVisibility = ref<boolean>(true);
+const DateVisibility = ref<boolean>(true);
 const items = ["Daily", "Weekly", "Monthly"];
-const handleClickOutside = (event) => {
+const handleClickOutside = (event:PointerEvent) => {
     if (
         pickerContainer.value &&
         !pickerContainer.value.contains(event.target)
@@ -18,7 +17,6 @@ const handleClickOutside = (event) => {
         DateVisibility.value = true;
     }
 };
-
 onMounted(() => {
     document.addEventListener("click", handleClickOutside);
 });
@@ -28,11 +26,11 @@ onUnmounted(() => {
 });
 // Date Constraints (Days 1-28 only)
 // We set min/max to a specific month/year to prevent navigation
-const onDateSelect = (selectedDate) => {
+const onDateSelect = (selectedDate:any) => {
     const day = selectedDate.getDate();
 };
-</script>
-<script>
+
+
 const currentYear = new Date().getFullYear();
 const currentMonth = new Date().getMonth(); // 0-indexed
 
@@ -44,15 +42,20 @@ const maxDate = new Date(currentYear, currentMonth, 28)
     .toISOString()
     .substring(0, 10);
 // Extra safety: Disable any date not between 1 and 28 (in case logic shifts)
-const allowedMonthes = (date) => {
+const allowedMonthes = (date:any) => {
     const day = new Date(date).getDate();
     return day >= 1 && day <= 28;
 };
+
+interface Props {
+    settings: AppSettings;
+}
+const props = defineProps<Props>();
 </script>
 <template>
     <div class="flex flex-row items-center gap-2" ref="pickerContainer">
         <label class="text-sm">Schedual:</label>
-        <v-menu :location="location">
+        <v-menu >
             <template v-slot:activator="{ props }">
                 <v-btn
                     flat
@@ -116,7 +119,7 @@ const allowedMonthes = (date) => {
             </v-btn>
             <v-date-picker
                 :hidden="DateVisibility"
-                v-model="date"
+                v-model="Date"
                 :min="minDate"
                 :max="maxDate"
                 controlVariant="modal"

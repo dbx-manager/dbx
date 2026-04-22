@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { ref } from "vue";
 
 interface Props {
     lable: string;
     inputValue?: string;
     icon?: string;
 }
-const hover = ref<boolean>(false);
+
 
 defineProps<Props>();
 </script>

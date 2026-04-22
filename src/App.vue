@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import "./assets/styles/style.css";
 import TopBar from "./Component/TopBar.vue";
+
+
 </script>
 
 <template>

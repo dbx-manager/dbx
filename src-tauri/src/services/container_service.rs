@@ -1,13 +1,14 @@
-use crate::classes::containers::ContainersState;
-use crate::classes::socket::PodmanSocket;
-use podman_api::models::ListContainer;
+use crate::structs::container::{Container, ContainerList};
+use crate::structs::socket::PodmanSocket;
+
+use std::{collections::HashMap};
 use tauri::State;
 
 #[tauri::command]
 pub async fn get_container_list(
-    containers_state: State<'_, ContainersState>,
-) -> Result<Vec<ListContainer>, String> {
-    let data = containers_state.data.read().await;
+    containers_state: State<'_, ContainerList>,
+) -> Result<HashMap<String,Container>, String> {
+    let data = containers_state.containers.read().await;
     Ok(data.clone())
 }
 

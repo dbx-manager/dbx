@@ -4,9 +4,19 @@ import KeepCounter from "../../Component/KeepCounter.vue";
 import TextInputWithLable from "../../Component/TextInputWithLable.vue";
 import SchedualDropDown from "../../Component/SchedualDropDown.vue";
 import BackupContainerWithController from "../../Component/BackupContainerWithController.vue";
-import { settings } from "../../Functions/FechingContainersWithRefresh";
-defineProps();
+import { ContainerListState } from "../../stores/ContainerListState";
+import { onMounted, onUnmounted } from "vue";
 
+const props = defineProps();
+const containerListState = ContainerListState();
+
+onMounted(() => {
+    containerListState.startAutoRefresh();
+});
+
+onUnmounted(() => {
+    containerListState.stopAutoRefresh();
+});
 </script>
 <template>
     <div class="flex flex-col gap-5">
@@ -15,9 +25,9 @@ defineProps();
         >
             <v-row dense>
                 <div class="grid grid-row-2 pl-4 py-4 w-fit! gap-x-4 gap-2 text-sm">
-                    <TextInputWithLable lable="Location :" :inputValue="settings.backupLocationPath"  />
+                    <TextInputWithLable lable="Location :" :inputValue="containerListState.settings.settings.backupLocationPath"  />
                     <div class="flex flex-row gap-4">
-                        <SchedualDropDown />
+                        <SchedualDropDown :settings="containerListState.settings.settings" />
                         <keep-counter />
                     </div>
                 </div>
@@ -29,7 +39,7 @@ defineProps();
                     <TextInputWithLable
                         class="col-span-2"
                         lable="Shared Package Cache:"
-                        :inputValue="settings.packageCachePath"
+                        :inputValue="containerListState.settings.settings.packageCachePath"
                     />
                     <!-- TODO :add the size collection -->
                     <span>Totla Backups Size: </span>

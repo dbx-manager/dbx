@@ -1,9 +1,9 @@
 import { invoke } from "@tauri-apps/api/core";
-import { ListContainer } from "../Types/ListContainer";
+import { Container } from "../types/ListContainer";
 
 export async function  list_containers() {
     let contianersJson;
-    contianersJson = await invoke<ListContainer[]>("get_container_list");
-    // console.log(contianersJson[0])
+    contianersJson = await invoke<Container[]>("get_container_list");
+    // console.log(contianersJson["Ubuntu"])
     return contianersJson
 }

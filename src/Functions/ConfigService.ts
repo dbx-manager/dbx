@@ -5,6 +5,7 @@ export interface BackupConfig {
   containers: string[];
   backup_location_path: string;
   cron_schedule: string;
+  autostart_containers: string[];
 }
 
 // Get current configuration

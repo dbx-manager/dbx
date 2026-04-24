@@ -1,5 +1,7 @@
 use crate::structs::container::{Container, ContainerList};
+use crate::structs::new_container_request::NewContainerRequest;
 use crate::structs::socket::PodmanSocket;
+use crate::controllers::distrobox_controller::create_distrobox_container;
 
 use std::{collections::HashMap};
 use tauri::State;
@@ -10,6 +12,10 @@ pub async fn get_container_list(
 ) -> Result<HashMap<String,Container>, String> {
     let data = containers_state.containers.read().await;
     Ok(data.clone())
+}
+#[tauri::command]
+pub async fn create_new_container(request: NewContainerRequest) -> Result<(), String> {
+    create_distrobox_container(request).await
 }
 
 #[tauri::command]
@@ -42,7 +48,7 @@ pub async fn unpause_container(id: String) -> Result<(), String> {
     if let Err(e) = podman.containers().get(id).unpause().await {
         eprintln!("{}", e);
     }
-    // execute_script_in_container(id).await;
 
     Ok(())
 }
+

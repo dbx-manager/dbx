@@ -4,6 +4,7 @@ import { Container } from "../types/ListContainer";
 import { defineStore } from "pinia";
 import { list_containers } from "../Functions/ListingContaienrs";
 import { get_exported_apps, get_system_apps } from "../Functions/AppsService";
+import { invoke } from "@tauri-apps/api/core";
 
 export const ContainerListState = defineStore("ContainerListState", () => {
   const containerList = ref<Container[]>([]);
@@ -31,9 +32,14 @@ export const ContainerListState = defineStore("ContainerListState", () => {
     stopAutoRefresh();
     refreshInterval.value = setInterval(async () => {
       fetchContainerList();
+      //TODO add fech backup and autostart variables
+      s()
     }, intervalDuration.value);
   }
-
+async function s(){
+  
+await invoke("match_config_container")
+}
   function stopAutoRefresh() {
     if (refreshInterval.value) {
       clearInterval(refreshInterval.value);

@@ -36,10 +36,12 @@ pub async fn run() {
         .manage(config_state)
         .invoke_handler(tauri::generate_handler![
             get_container_list,
+            create_new_container,
             start_container,
             stop_container,
             pause_container,
             unpause_container,
+            match_config_container,
             get_exported_apps,
             get_system_apps,
             get_backup_config,

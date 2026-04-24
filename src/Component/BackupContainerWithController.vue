@@ -9,6 +9,7 @@ const backup_files = ref<BackupFileList | null>(null);
 const loaded = ref<boolean>(false);
 async function get_backup_directory_list() {
     backup_files.value = await invoke("get_backup_directory_list");
+    console.log( await invoke("get_backup_config"));
 }
 onMounted(async () => {
     await get_backup_directory_list().then(() => (loaded.value = true));

@@ -20,25 +20,19 @@ onUnmounted(() => {
 
 <template>
     <v-container v-for="container in containerListState.containerList"
-        class="bg-[#333337] rounded-lg flex flex-row max-w-full! gap-2 pr-1">
-        <div class="w-[20%]! flex-col bg-transparent grid grid-cols-2 gap-1">
-            <div class=" flex flex-row col-span-2  items-center gap-3">
-                <v-icon color="#dadadaff" size="x-large" fill="white">mdi-cube-outline</v-icon>
+        class="bg-[#333337] rounded-lg flex flex-row max-w-full! gap-1 pr-0">
+        <div class="w-[20%]! bg-transparent grid grid-cols-2 gap-1">
+            <div class=" flex flex-row col-span-2  items-start gap-1">
+                <v-tooltip location="top" activator="parent" :text="container.state.charAt(0).toUpperCase()+container.state.substring(1)"/>
+                <v-icon  size="x-large" :color="container.state.match('running')?'#00a63e':'red'">mdi-cube-outline</v-icon>
                 <div class="flex justify-center items-center flex-wrap ">
-
                     <span class="text-white text-2xl font-light " >{{
                         container.name
                     }}</span>
-                <span  class=" w-fit flex flex-col text-end  sm:pl-3 " :class="{
-                    'text-green-600': container.state.match('running'),
-                    'text-red': !container.state.match('running'),
-                }">{{
-                    container.state.charAt(0).toUpperCase() + container.state.slice(1)
-                }}</span>
         </div>
             </div>
             <container-controller :containerId="container.id" :status="container.state"
-                :autoBackup="container.autobackup" />
+                :autoBackup="container.autobackup??false" :autoStartup="container.autostart??false"/>
         </div>
 
 

@@ -5,15 +5,16 @@ use tokio::sync::RwLock;
 use crate::controllers::config_controller::load_config;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct BackupConfig {
-    pub containers: Vec<String>,
+pub struct Config {
+    pub backup_containers: Vec<String>,
     pub cron_schedule: Option<String>,
     pub package_cache_path: String,
     pub backup_location_path: String,
+    pub autostart_containers: Vec<String>,
 }
 #[derive(Clone)]
 pub struct ConfigState {
-    pub data: Arc<RwLock<BackupConfig>>,
+    pub data: Arc<RwLock<Config>>,
 }
 
 impl ConfigState {

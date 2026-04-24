@@ -1,15 +1,17 @@
 use crate::{
     controllers::config_controller::set_backup_config,
-    structs::config::{BackupConfig, ConfigState, DirectoryListInfo, DirectorySizeInfo, FileInfo},
+    structs::{
+        config::{Config, ConfigState, DirectoryListInfo, DirectorySizeInfo, FileInfo},
+        container::ContainerList,
+    },
 };
 use fs_extra::dir::get_size;
 use std::fs;
-use tauri::Emitter;
 
 #[tauri::command]
 pub async fn get_backup_config(
     config_state: tauri::State<'_, ConfigState>,
-) -> Result<BackupConfig, String> {
+) -> Result<Config, String> {
     let config = config_state.data.read().await.clone();
     Ok(config)
 }
@@ -17,8 +19,7 @@ pub async fn get_backup_config(
 #[tauri::command]
 pub async fn update_backup_config(
     config_state: tauri::State<'_, ConfigState>,
-    new_config: BackupConfig,
-    app_handle: tauri::AppHandle,
+    new_config: Config,
 ) -> Result<(), String> {
     // Update the in-memory config state
     let mut config_lock = config_state.data.write().await;
@@ -29,14 +30,40 @@ pub async fn update_backup_config(
         return Err(format!("Failed to save config to file: {}", e));
     }
 
-    // Emit event to notify frontend of config change
-    app_handle
-        .emit("config-updated", &new_config)
-        .map_err(|e| format!("Failed to emit config update event: {}", e))?;
-
     Ok(())
 }
+#[tauri::command]
+pub async fn match_config_container(
+    config_state: tauri::State<'_, ConfigState>,
+    container_state: tauri::State<'_, ContainerList>,
+) -> Result<bool, String> {
+    let configstate = config_state.data.read().await.clone();
+    let mut containerstate = container_state.containers.write().await;
 
+    //TODO: find a better way to mach them 
+
+    for backup_id in configstate.backup_containers {
+        for container in containerstate.values_mut() {
+            if let Some(current_id) = &container.id {
+                if current_id == &backup_id {
+                    container.autobackup = Some(true);
+                    break; 
+                }
+            }
+        }
+    }
+    for autostart_id in configstate.autostart_containers {
+        for container in containerstate.values_mut() {
+            if let Some(current_id) = &container.id {
+                if current_id == &autostart_id {
+                    container.autostart = Some(true);
+                    break; 
+                }
+            }
+        }
+    }
+    Ok(true)
+}
 #[tauri::command]
 pub async fn get_package_cache_size(
     config_state: tauri::State<'_, ConfigState>,

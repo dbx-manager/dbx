@@ -1,13 +1,39 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
-import { formatCronToTime, formatCronToDate } from "../utils/cronUtils";
-import { AppSettings } from "../composables/useSettings";
+import { onMounted, onUnmounted, ref, watch } from "vue";
+import { formatCronToTime, formatCronToDate, CronExp } from "../utils/cronUtils";
+
+interface Props {
+    cron_schedual: string;
+    cron_sync_function: (c: CronExp) => void;
+}
+
+const props = defineProps<Props>();
 
 const SelectedItem = ref<string>("Daily");
+const FinalCron = ref<CronExp | null>(null);
 const pickerContainer = ref<any>(null);
 const TimeVisibility = ref<boolean>(true);
 const DateVisibility = ref<boolean>(true);
-const items = ["Daily", "Weekly", "Monthly"];
+
+const items = ["Daily", "Monthly"];
+
+
+const currentYear = new Date().getFullYear();
+const currentMonth = new Date().getMonth(); // 0-indexed
+
+// Set range to 1st to 28th of the current month/year
+const minDate = new Date(currentYear, currentMonth, 1)
+.toISOString()
+.substring(0, 10);
+const maxDate = new Date(currentYear, currentMonth, 28)
+.toISOString()
+.substring(0, 10);
+// Extra safety: Disable any date not between 1 and 28 (in case logic shifts)
+const allowedMonthes = (date:any) => {
+    const day = new Date(date).getDate();
+    return day >= 1 && day <= 28;
+};
+
 const handleClickOutside = (event:PointerEvent) => {
     if (
         pickerContainer.value &&
@@ -17,40 +43,64 @@ const handleClickOutside = (event:PointerEvent) => {
         DateVisibility.value = true;
     }
 };
+
+const initializeCron = (cronString: string) => {
+  // Cleanup existing instance if exists
+  if (FinalCron.value) {
+    FinalCron.value=null;
+  }
+
+  // Create fresh new CronExp with updated value
+  FinalCron.value = new CronExp(props.cron_sync_function, cronString);
+  
+  // Auto-detect and set correct UI state
+  const dayField = FinalCron.value.getFields().day;
+  SelectedItem.value = dayField === '*' ? 'Daily' : 'Monthly';
+};
+
 onMounted(() => {
     document.addEventListener("click", handleClickOutside);
+    
+    // Initialize on mount
+    if (props.cron_schedual) {
+      initializeCron(props.cron_schedual);
+    }
 });
+
+// ✅ Reactive watcher for prop changes
+watch(() => props.cron_schedual, (newCronValue) => {
+  if (newCronValue && FinalCron.value?.toString() !== newCronValue) {
+    initializeCron(newCronValue);
+  }
+}, { immediate: false });
 
 onUnmounted(() => {
     document.removeEventListener("click", handleClickOutside);
+    
+    // Proper cleanup on unmount
+    if (FinalCron.value) {
+      FinalCron.value=null;
+      FinalCron.value = null;
+    }
 });
 // Date Constraints (Days 1-28 only)
 // We set min/max to a specific month/year to prevent navigation
 const onDateSelect = (selectedDate:any) => {
-    const day = selectedDate.getDate();
+    if(!selectedDate){return}
+    const s=selectedDate.getDate()
+    FinalCron.value?.setField('day',s)
+    // console.log(selectedDate.getDay())
+    // console.log(FinalCron.value?.getFields())
+
 };
+function onTimeSelect(newTime:string|null) {
+    if(!newTime){return}
+    const s=newTime.split(':')
+    FinalCron.value?.setField('hour',s[0])
+    FinalCron.value?.setField('min',s[1])
+    // console.log(FinalCron.value?.getFields())
 
-
-const currentYear = new Date().getFullYear();
-const currentMonth = new Date().getMonth(); // 0-indexed
-
-// Set range to 1st to 28th of the current month/year
-const minDate = new Date(currentYear, currentMonth, 1)
-    .toISOString()
-    .substring(0, 10);
-const maxDate = new Date(currentYear, currentMonth, 28)
-    .toISOString()
-    .substring(0, 10);
-// Extra safety: Disable any date not between 1 and 28 (in case logic shifts)
-const allowedMonthes = (date:any) => {
-    const day = new Date(date).getDate();
-    return day >= 1 && day <= 28;
-};
-
-interface Props {
-    settings: AppSettings;
-}
-const props = defineProps<Props>();
+} 
 </script>
 <template>
     <div class="flex flex-row items-center gap-2" ref="pickerContainer">
@@ -75,7 +125,7 @@ const props = defineProps<Props>();
                     v-for="item in items"
                     :key="item"
                     :value="item"
-                    v-on:click="SelectedItem = item"
+                    v-on:click="{SelectedItem = item;FinalCron?.setField('day','*')}"
                 >
                     <v-list-item-title>{{ item }}</v-list-item-title>
                 </v-list-item>
@@ -93,13 +143,14 @@ const props = defineProps<Props>();
                         DateVisibility = true;
                     }
                 "
-            :text="formatCronToTime(settings.cronSchedule)"    
+            :text="formatCronToTime(FinalCron?.toString()??' ')"    
             
                 />
             
             <v-time-picker
                 :hidden="TimeVisibility"
                 rounded="lg"
+                @update:model-value="onTimeSelect"
                 class="absolute z-50 mt-10"
             />
         </div>
@@ -107,10 +158,10 @@ const props = defineProps<Props>();
             <v-btn
             flat
              color="#22222698"
-            :text="formatCronToDate(settings.cronSchedule)"    
+            :text="formatCronToDate(FinalCron?.toString()??'')"    
             :hidden="SelectedItem.match('Monthly')==null"
                 @Click="
-                    {
+                    {   
                         DateVisibility = !DateVisibility;
                         TimeVisibility = true;
                     }
@@ -119,7 +170,6 @@ const props = defineProps<Props>();
             </v-btn>
             <v-date-picker
                 :hidden="DateVisibility"
-                v-model="Date"
                 :min="minDate"
                 :max="maxDate"
                 controlVariant="modal"

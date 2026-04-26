@@ -4,8 +4,10 @@ import { onMounted, onUnmounted} from "vue";
 import MoreMenuActionButton from "./MoreMenuActionButton.vue";
 import { ContainerListState } from "../../stores/ContainerListState";
 import ContainerController from "./ContainerController.vue";
+import { useSettingsStore } from "../../stores/useSettingsStore";
 const props = defineProps();
 const containerListState = ContainerListState();
+const s = useSettingsStore()
 
 
 onMounted(() => {
@@ -16,6 +18,33 @@ onUnmounted(() => {
     containerListState.stopAutoRefresh();
 });
 
+
+function add_container_to_auto_backup(event: Event,containerId:string) {
+    const target = event.target as HTMLInputElement;
+    const isOn: boolean = target.checked;
+
+    if (isOn) {
+        s.settings.backup_containers.add(containerId)
+        s.setBackupContainers(s.settings.backup_containers)
+    }
+    else {
+        s.settings.backup_containers.delete(containerId)
+        s.setBackupContainers(s.settings.backup_containers)
+    }
+
+}
+function add_container_to_auto_start(event: Event,containerId:string) {
+    const target = event.target as HTMLInputElement;
+    const isOn: boolean = target.checked;
+    if (isOn) {
+        s.settings.autostart_containers.add(containerId)
+        s.setAutostartContainers(s.settings.autostart_containers)
+    }
+    else {
+        s.settings.autostart_containers.delete(containerId)
+        s.setAutostartContainers(s.settings.autostart_containers)
+    }
+}
 </script>
 
 <template>
@@ -31,7 +60,7 @@ onUnmounted(() => {
                     }}</span>
         </div>
             </div>
-            <container-controller :containerId="container.id" :status="container.state"
+            <container-controller :containerId="container.id" :status="container.state" :autoBackupCallback="add_container_to_auto_backup" :autoStartCallback="add_container_to_auto_start"
                 :autoBackup="container.autobackup??false" :autoStartup="container.autostart??false"/>
         </div>
 

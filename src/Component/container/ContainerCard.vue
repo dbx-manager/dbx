@@ -11,10 +11,11 @@ const isOpen = ref<boolean>(false);
 
 <template>
     <div
+    @click="isOpen = !isOpen"
         class="bg-[#333337] hover:bg-[#404045] cursor-pointer p-4 rounded-lg max-w-full! gap-2"
     >
         <div
-            @click="isOpen = !isOpen"
+            
             class="flex bg-transparent justify-between"
         >
             <div class="flex flex-row items-center! gap-2">

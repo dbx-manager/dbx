@@ -1,6 +1,57 @@
 /**
  * Utility functions for parsing and formatting cron expressions
  */
+type CronField = 'min' | 'hour' | 'day' | 'month' | 'weekday';
+
+export class CronExp {
+  min: string;
+  hour: string;
+  day: string;
+  month: string;
+  weekday: string;
+  private onChange?: (cron: CronExp) => void;
+
+  constructor(onChange?: (cron: CronExp) => void, cronString?: string) {
+    this.min = '*';
+    this.hour = '*';
+    this.day = '*';
+    this.month = '*';
+    this.weekday = '*';
+    this.onChange = onChange;
+
+    if (cronString) {
+      this.parse(cronString);
+    }
+  }
+
+  parse(cronString: string): void {
+    const parts = cronString.trim().split(/\s+/);
+    if (parts.length !== 5) {
+      throw new Error('Invalid cron string. Expected 5 fields.');
+    }
+    [this.min, this.hour, this.day, this.month, this.weekday] = parts;
+    this.onChange?.(this);
+  }
+
+  getFields(): { min: string; hour: string; day: string; month: string; weekday: string } {
+    return {
+      min: this.min,
+      hour: this.hour,
+      day: this.day,
+      month: this.month,
+      weekday: this.weekday,
+    };
+  }
+
+  setField(field: CronField, value: string): void {
+    this[field] = value;
+    this.onChange?.(this);
+  }
+
+  toString(): string {
+    return `${this.min} ${this.hour} ${this.day} ${this.month} ${this.weekday}`;
+  }
+}
 
 /**
  * Parses a cron expression and extracts hour and minute components

@@ -101,6 +101,7 @@ pub async fn get_backup_directory_list(
         let name = entry.file_name().to_str().unwrap_or("").to_string();
         let file_path = entry.path().to_str().unwrap_or("").to_string();
         let size_bytes = metadata.len();
+        let size_human = format_bytes(size_bytes);
         let is_dir = metadata.is_dir();
 
         // Only count file sizes for regular files (not directories)
@@ -112,6 +113,7 @@ pub async fn get_backup_directory_list(
             name,
             path: file_path,
             size_bytes,
+            size_human,
             is_dir,
         });
     }

@@ -7,5 +7,6 @@ interface BackupFile{
     name:string;
     path:string;
     size_bytes:number;
+    size_human:string;
     is_dir:boolean;
 }

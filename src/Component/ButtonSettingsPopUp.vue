@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useSettings } from "../composables/useSettings";
 import { ref } from "vue";
+import { useSettingsStore } from "../stores/useSettingsStore";
 
-const { settings, setUpdateInterval, setAutoUpdateEnabled } = useSettings();
+const { settings, setUpdateInterval, setAutoUpdateEnabled } = useSettingsStore();
 
 // Available interval options in milliseconds
 const intervalOptions = [

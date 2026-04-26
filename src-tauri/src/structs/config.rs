@@ -31,6 +31,7 @@ pub struct FileInfo {
     pub name: String,
     pub path: String,
     pub size_bytes: u64,
+    pub size_human: String,
     pub is_dir: bool,
 }
 

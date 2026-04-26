@@ -58,9 +58,9 @@
 import { onMounted, ref } from "vue";
 import TextInputWithLable from "../TextInputWithLable.vue";
 import CheckBoxWithTooltip from "../CheckBoxWithTooltip.vue";
-import { suggestedDistroboxImages } from "../../class/suggestedImages";
 import { homeDir } from "@tauri-apps/api/path";
 import { postCreateNewContainer } from "../../Functions/NewContainerService";
+import { suggestedDistroboxImages } from "../../types/suggestedImages";
 interface Props {
     dialog: boolean;
 }

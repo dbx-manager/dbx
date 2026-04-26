@@ -1,14 +1,14 @@
 import { ref, onUnmounted } from "vue";
-import { useSettings } from "../composables/useSettings";
 import { Container } from "../types/ListContainer";
 import { defineStore } from "pinia";
 import { list_containers } from "../Functions/ListingContaienrs";
 import { get_exported_apps, get_system_apps } from "../Functions/AppsService";
 import { invoke } from "@tauri-apps/api/core";
+import { useSettingsStore } from "./useSettingsStore";
 
 export const ContainerListState = defineStore("ContainerListState", () => {
   const containerList = ref<Container[]>([]);
-  const settings = useSettings();
+  const settings = useSettingsStore();
   const refreshInterval = ref<ReturnType<typeof setInterval> | null>(null);
   const intervalDuration = ref<number>(1000); // default to 1 second
 
@@ -32,11 +32,10 @@ export const ContainerListState = defineStore("ContainerListState", () => {
     stopAutoRefresh();
     refreshInterval.value = setInterval(async () => {
       fetchContainerList();
-      //TODO add fech backup and autostart variables
-      s()
+      matchConfigWithContainerList()
     }, intervalDuration.value);
   }
-async function s(){
+async function matchConfigWithContainerList(){
   
 await invoke("match_config_container")
 }

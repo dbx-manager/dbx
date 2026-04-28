@@ -3,7 +3,11 @@ use std::fs;
 use tokio::time::{interval, Duration};
 use crate::structs::config::Config;
 use crate::structs::config::ConfigState;
-
+use cron::Schedule;
+use std::str::FromStr;
+use chrono::Utc;
+use std::time::Duration as StdDuration;
+use tokio::time::sleep;
 
 pub fn load_config() -> Config {
     // Try to load from user config directory first
@@ -64,14 +68,14 @@ pub fn load_from_sample() -> Option<Config> {
 
 pub fn copy_sample_to_user_config() -> Result<(), Box<dyn std::error::Error>> {
     let user_config_path = get_user_config_path();
-    let user_confegeration_sample = load_from_sample().unwrap();
+    let user_config_sample = load_from_sample().unwrap();
     // Create parent directory if it doesn't exist
     if let Some(parent) = user_config_path.parent() {
         fs::create_dir_all(parent)?;
     }
     let e = fs::write(
         user_config_path.as_path(),
-        serde_json::to_string_pretty(&user_confegeration_sample).unwrap(),
+        serde_json::to_string_pretty(&user_config_sample).unwrap(),
     );
     if e.is_err() {
         eprintln!(
@@ -325,5 +329,41 @@ pub async fn start_config_monitoring(config_state: ConfigState) {
                 }
             }
         }
+    }
+}
+
+/// Background task that runs scheduled backups based on the cron expression in the config.
+pub async fn start_backup_scheduler(config_state: ConfigState) {
+    loop {
+        let schedule_opt = {
+            let cfg = config_state.data.read().await;
+            cfg.cron_schedule.clone()
+        };
+        if let Some(expr) = schedule_opt {
+            if let Ok(schedule) = Schedule::from_str(&expr) {
+                let now = Utc::now();
+                if let Some(next) = schedule.upcoming(Utc).next() {
+                    let wait = next - now;
+                    let wait_secs = wait.num_seconds();
+                    if wait_secs > 0 {
+                        sleep(StdDuration::from_secs(wait_secs as u64)).await;
+                    }
+                    // Perform backup for all containers marked for auto-backup
+                    let container_ids = {
+                        let cfg = config_state.data.read().await;
+                        cfg.backup_containers.clone()
+                    };
+                    for id in container_ids {
+                        let _ = crate::services::config_service::backup_container(
+                            id,
+                            config_state.data.read().await.backup_location_path.clone(),
+                        )
+                        .await;
+                    }
+                }
+            }
+        }
+        // Sleep a short while before checking again (in case of errors)
+        sleep(StdDuration::from_secs(30)).await;
     }
 }

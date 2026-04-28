@@ -1,28 +1,51 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import ContainerCard from "./container/ContainerCard.vue";
-import { onMounted } from "vue";
 import { invoke } from "@tauri-apps/api/core";
+import { deleteBackup, recreateContainerFromBackup } from "../../Functions/BackupService";
+import { useSettingsStore } from "../../stores/useSettingsStore";
 
 const props = defineProps();
 const backup_files = ref<BackupFileList | null>(null);
 const loaded = ref<boolean>(false);
-const errorMessage = ref<string | null>(null)
+const errorMessage = ref<string | null>(null);
+const settings = useSettingsStore();
+
 async function get_backup_directory_list() {
     backup_files.value = await invoke("get_backup_directory_list");
     console.log(await invoke("get_backup_config"));
 }
+
+async function handleDelete(backupPath: string) {
+    try {
+        await deleteBackup(backupPath);
+        // Refresh list
+        await get_backup_directory_list();
+    } catch (e) {
+        console.error("Delete failed:", e);
+    }
+}
+
+async function handleRestore(backupPath: string, containerName: string) {
+    try {
+        const newName = prompt("Enter new container name:", `restored_${containerName}`);
+        if (newName) {
+            await recreateContainerFromBackup(backupPath, newName);
+            alert(`Container ${newName} created from backup.`);
+        }
+    } catch (e) {
+        console.error("Restore failed:", e);
+    }
+}
+
 onMounted(async () => {
     try {
         await get_backup_directory_list().then(() => (loaded.value = true));
-
     } catch (error: any) {
         loaded.value = true;
         errorMessage.value = error;
-        // console.log(errorMessage.value)
     }
 });
-
 </script>
 
 <template>
@@ -35,14 +58,14 @@ onMounted(async () => {
         <container-card v-if="backup_files != null" v-for="value in backup_files.files" :container-name="value.name"
             class="w-fit!">
             <div class="flex flex-row gap-1! text-[#b3b3b3]">
-                <!-- TODO add the date into the returned data from the backend -->
-                <p>Backed at:</p>
+                <!-- Extract container name from file name (format: containerId_timestamp.tar) -->
+                <p>Container: {{ value.name.split('_')[0] }}</p>
+                <p>Size: {{ value.size_human }}</p>
             </div>
-            <div class="text-[#b3b3b3]">Size: {{ value.size_human }}</div>
             <div class="flex flex-row justify-between items-center gap-2!">
                 <div class="flex gap-1">
-                    <v-btn size="small" flat color="#bd1919" rounded="lg" class="h-9!">Delete</v-btn>
-                    <v-btn text="Restore" flat color="#651d9d" rounded="lg" size="small" class="absolute h-9!" />
+                    <v-btn size="small" flat color="#bd1919" rounded="lg" class="h-9!" @click="handleDelete(value.path)">Delete</v-btn>
+                    <v-btn text="Restore" flat color="#651d9d" rounded="lg" size="small" class="absolute h-9!" @click="handleRestore(value.path, value.name)" />
                 </div>
             </div>
         </container-card>

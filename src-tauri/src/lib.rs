@@ -3,6 +3,7 @@ mod scripts;
 mod controllers;
 mod services;
 use crate::controllers::config_controller::start_config_monitoring;
+use crate::controllers::config_controller::start_backup_scheduler;
 use crate::controllers::containers_controller::start_container_monitoring;
 use crate::structs::config::{ ConfigState};
 use crate::services::config_service::*;
@@ -30,25 +31,34 @@ pub async fn run() {
         start_config_monitoring(config_state_clone).await;
     });
 
+    // Start scheduled backup task
+    let config_state_clone2 = config_state.clone();
+    tokio::spawn(async move {
+        start_backup_scheduler(config_state_clone2).await;
+    });
+
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .manage(containers_state)
         .manage(config_state)
-        .invoke_handler(tauri::generate_handler![
-            get_container_list,
-            create_new_container,
-            start_container,
-            stop_container,
-            pause_container,
-            unpause_container,
-            match_config_container,
-            get_exported_apps,
-            get_system_apps,
-            get_backup_config,
-            update_backup_config,
-            get_package_cache_size,
-            get_backup_directory_list
-        ])
+.invoke_handler(tauri::generate_handler![
+    get_container_list,
+    create_new_container,
+    stop_container,
+    stop_container,
+    pause_container,
+    unpause_container,
+    match_config_container,
+    get_exported_apps,
+    get_system_apps,
+    get_backup_config,
+    update_backup_config,
+    get_package_cache_size,
+    get_backup_directory_list,
+    backup_container,
+    delete_backup,
+    recreate_container_from_backup
+])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

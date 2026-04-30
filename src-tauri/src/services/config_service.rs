@@ -3,16 +3,10 @@ use crate::{
     structs::{
         config::{Config, ConfigState, DirectoryListInfo, DirectorySizeInfo, FileInfo},
         container::ContainerList,
-        socket::PodmanSocket,
     },
 };
 use fs_extra::dir::get_size;
 use std::fs;
-use std::path::Path;
-use std::fs::File;
-use std::io::Write;
-use chrono::Utc;
-use futures_util::StreamExt;
 
 #[tauri::command]
 pub async fn get_backup_config(
@@ -136,94 +130,6 @@ pub async fn get_backup_directory_list(
         files,
         total_size_bytes,
     })
-}
- 
-// Create a backup of a container by exporting it to a tar file.
-#[tauri::command]
-pub async fn backup_container(container_id: String, backup_dir: String) -> Result<String, String> {
-    // Ensure backup directory exists
-    let backup_path = Path::new(&backup_dir);
-    if !backup_path.exists() {
-        std::fs::create_dir_all(&backup_path).map_err(|e| format!("Failed to create backup dir: {}", e))?;
-    }
-
-    // Build backup file name with timestamp
-    let timestamp = Utc::now().format("%Y%m%d%H%M%S").to_string();
-    let file_name = format!("{}_{}.tar", container_id, timestamp);
-    let full_path = backup_path.join(&file_name);
-
-    // Get podman instance and container
-    let podman = PodmanSocket::get_instance().await.socket.clone();
-    let container = podman.containers().get(&container_id);
-
-    // Export container to tar stream
-    let mut stream = container.export();
-
-    // Open file for writing
-    let mut file = File::create(&full_path).map_err(|e| format!("Failed to create backup file: {}", e))?;
-
-    // Write stream chunks to file
-    while let Some(chunk) = stream.next().await {
-        let data = chunk.map_err(|e| format!("Error streaming export: {}", e))?;
-        file.write_all(&data).map_err(|e| format!("Failed to write to backup file: {}", e))?;
-    }
-
-    Ok(full_path.to_string_lossy().to_string())
-}
-
-// Delete a backup file.
-#[tauri::command]
-pub async fn delete_backup(backup_path: String) -> Result<(), String> {
-    let path = Path::new(&backup_path);
-    if !path.exists() {
-        return Err("Backup file does not exist".to_string());
-    }
-    std::fs::remove_file(path).map_err(|e| format!("Failed to delete backup: {}", e))?;
-    Ok(())
-}
-
-// Recreate a container from a backup tar file using distrobox.
-#[tauri::command]
-pub async fn recreate_container_from_backup(
-    backup_path: String,
-    new_container_name: String,
-) -> Result<String, String> {
-    // First, import the container from the backup tar
-    let _podman = PodmanSocket::get_instance().await.socket.clone();
-    
-    // Load the image from tar (podman load)
-    let import_result = std::process::Command::new("podman")
-        .args(&["load", "-i", &backup_path])
-        .output()
-        .map_err(|e| format!("Failed to execute podman load: {}", e))?;
-    
-    if !import_result.status.success() {
-        let err_msg = String::from_utf8_lossy(&import_result.stderr);
-        return Err(format!("Failed to load backup: {}", err_msg));
-    }
-    
-    // Parse the output to get the image ID/name
-    let output = String::from_utf8_lossy(&import_result.stdout);
-    let image_name = output
-        .lines()
-        .find(|line| line.contains("Loaded image:"))
-        .and_then(|line| line.split(": ").nth(1))
-        .unwrap_or("imported-image")
-        .trim()
-        .to_string();
-    
-    // Create new container using distrobox with the imported image
-    let create_result = std::process::Command::new("distrobox")
-        .args(&["create", "--name", &new_container_name, &image_name])
-        .output()
-        .map_err(|e| format!("Failed to create distrobox container: {}", e))?;
-    
-    if !create_result.status.success() {
-        let err_msg = String::from_utf8_lossy(&create_result.stderr);
-        return Err(format!("Failed to create container: {}", err_msg));
-    }
-    
-    Ok(new_container_name)
 }
 
 // Helper function to format bytes to human readable size

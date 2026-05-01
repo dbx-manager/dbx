@@ -4,9 +4,10 @@ import { ref } from "vue";
 interface Props {
     containerName?: string;
     iconUrl?: string;
+    isOpen?:boolean;
 }
-defineProps<Props>();
-const isOpen = ref<boolean>(false);
+const props = defineProps<Props>();
+const isOpen = ref<boolean>(props.isOpen?? false);
 </script>
 
 <template>

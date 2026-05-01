@@ -1,5 +1,6 @@
 use crate::{
     controllers::config_controller::set_backup_config,
+    controllers::cron_controller::update_cron_schedule,
     structs::{
         config::{Config, ConfigState, DirectoryListInfo, DirectorySizeInfo, FileInfo},
         container::ContainerList,
@@ -29,7 +30,12 @@ pub async fn update_backup_config(
     if let Err(e) = set_backup_config(&new_config) {
         return Err(format!("Failed to save config to file: {}", e));
     }
-
+    
+    // Update cron schedule with new config
+    let cron_config_state = (*config_state).clone();
+    tokio::spawn(async move {
+        update_cron_schedule(cron_config_state).await;
+    });
     Ok(())
 }
 #[tauri::command]
@@ -40,14 +46,14 @@ pub async fn match_config_container(
     let configstate = config_state.data.read().await.clone();
     let mut containerstate = container_state.containers.write().await;
 
-    //TODO: find a better way to mach them 
+    //TODO: find a better way to mach them
 
     for backup_id in configstate.backup_containers {
         for container in containerstate.values_mut() {
             if let Some(current_id) = &container.id {
                 if current_id == &backup_id {
                     container.autobackup = Some(true);
-                    break; 
+                    break;
                 }
             }
         }
@@ -57,7 +63,7 @@ pub async fn match_config_container(
             if let Some(current_id) = &container.id {
                 if current_id == &autostart_id {
                     container.autostart = Some(true);
-                    break; 
+                    break;
                 }
             }
         }
@@ -94,6 +100,9 @@ pub async fn get_backup_directory_list(
 
     for entry in entries {
         let entry = entry.map_err(|e| format!("Failed to read directory entry: {}", e))?;
+        if !entry.file_name().to_str().unwrap_or("").ends_with(".tar") {
+            continue;
+        }
         let metadata = entry
             .metadata()
             .map_err(|e| format!("Failed to get metadata: {}", e))?;

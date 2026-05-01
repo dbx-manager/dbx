@@ -692,6 +692,7 @@ dependencies = [
  "dirs",
  "fs_extra",
  "futures-util",
+ "log",
  "podman-api",
  "regex",
  "serde",

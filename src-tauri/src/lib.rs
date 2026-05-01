@@ -4,6 +4,7 @@ mod controllers;
 mod services;
 use crate::controllers::config_controller::start_config_monitoring;
 use crate::controllers::containers_controller::start_container_monitoring;
+use crate::controllers::cron_controller::init_backup_cron;
 use crate::structs::config::{ ConfigState};
 use crate::services::config_service::*;
 use crate::structs::container::{ContainerList};
@@ -28,6 +29,11 @@ pub async fn run() {
 
     tokio::spawn(async move {
         start_config_monitoring(config_state_clone).await;
+    });
+
+    let cron_config_state = config_state.clone();
+    tokio::spawn(async move {
+        init_backup_cron(cron_config_state).await;
     });
 
     tauri::Builder::default()

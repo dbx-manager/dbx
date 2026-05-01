@@ -33,7 +33,7 @@ onMounted(async () => {
     <!-- <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"> -->
     <div v-if="loaded" class="flex flex-wrap gap-3 justify-center">
         <container-card v-if="backup_files != null" v-for="value in backup_files.files" :container-name="value.name"
-            class="w-fit!">
+            class="w-fit!" :is-open="true">
             <div class="flex flex-row gap-1! text-[#b3b3b3]">
                 <!-- TODO add the date into the returned data from the backend -->
                 <p>Backed at:</p>

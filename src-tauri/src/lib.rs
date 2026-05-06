@@ -10,6 +10,7 @@ use crate::services::config_service::*;
 use crate::structs::container::{ContainerList};
 use crate::services::apps_service::*;
 use crate::services::container_service::*;
+use crate::controllers::backup_controller::{create_backup, delete_backup, list_backups_for_container, get_latest_backup, restore_container_from_backup};
 
 #[tokio::main]
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -40,21 +41,26 @@ pub async fn run() {
         .plugin(tauri_plugin_opener::init())
         .manage(containers_state)
         .manage(config_state)
-        .invoke_handler(tauri::generate_handler![
-            get_container_list,
-            create_new_container,
-            start_container,
-            stop_container,
-            pause_container,
-            unpause_container,
-            match_config_container,
-            get_exported_apps,
-            get_system_apps,
-            get_backup_config,
-            update_backup_config,
-            get_package_cache_size,
-            get_backup_directory_list
-        ])
+         .invoke_handler(tauri::generate_handler![
+             get_container_list,
+             create_new_container,
+             start_container,
+             stop_container,
+             pause_container,
+             unpause_container,
+             match_config_container,
+             get_exported_apps,
+             get_system_apps,
+             get_backup_config,
+             update_backup_config,
+             get_package_cache_size,
+             get_backup_directory_list,
+             create_backup,
+             delete_backup,
+             list_backups_for_container,
+             get_latest_backup,
+             restore_container_from_backup
+         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -12,3 +12,6 @@ export async function pause_container(containerId:string) {
 export async function unpause_container(containerId:string) {
     await  invoke('unpause_container',{id:containerId});
 }
+export async function delete_container(containerId:string) {
+    await  invoke('delete_container',{id:containerId});
+}

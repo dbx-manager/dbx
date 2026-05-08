@@ -7,13 +7,7 @@ export async function get_system_apps(containerId: string){
   await invoke("get_system_apps", { containerId: containerId });
 }
 
-// Backup Controls
-export async function create_backup(containerId: string) {
-  return await invoke("create_backup", { containerId });
-}
-export async function delete_backup(filePath: string) {
-  return await invoke("delete_backup", { filePath });
-}
+
 export async function list_backups_for_container(containerId: string) {
   return await invoke("list_backups_for_container", { containerId });
 }

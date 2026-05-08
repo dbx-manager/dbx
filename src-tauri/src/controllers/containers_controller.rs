@@ -44,6 +44,15 @@ pub async fn fetch_containers_data() -> Vec<ListContainer> {
     })
 }
 
+// Delete a container by ID
+pub async fn delete_container(id: String) -> Result<(), String> {
+    let podman = PodmanSocket::get_instance().await.socket.clone();
+    podman.containers().get(&id).remove().await.map_err(|e| {
+        eprintln!("Failed to delete container {}: {}", id, e);
+        format!("Failed to delete container: {}", e)
+    })
+}
+
 // Background task function that updates container data
 pub async fn start_container_monitoring(container_state: ContainerList) {
     let mut interval = interval(Duration::from_secs(5));
@@ -53,6 +62,12 @@ pub async fn start_container_monitoring(container_state: ContainerList) {
         let new_containers = fetch_containers_data().await;
         
         let mut data_lock = container_state.containers.write().await;
+
+        // Build a set of current container names from the fresh data
+        let current_names: std::collections::HashSet<String> = new_containers
+            .iter()
+            .filter_map(|c| c.names.as_ref()?.first().cloned())
+            .collect();
 
         for container in new_containers {
             let name = container.names.unwrap().first().cloned().unwrap_or_default();
@@ -77,7 +92,7 @@ pub async fn start_container_monitoring(container_state: ContainerList) {
             }
         }
         
-        // TODO: Remove containers that no longer exist in fetch_containers_data
-        // This requires collecting IDs from new_containers first and retaining only those keys.
+        // Remove containers that no longer exist in the new data
+        data_lock.retain(|key, _| current_names.contains(key));
     }
 }

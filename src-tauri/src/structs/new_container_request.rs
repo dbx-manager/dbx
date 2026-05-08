@@ -2,6 +2,7 @@
 pub struct NewContainerRequest {
   pub container_name: String,
   pub home_directory: String,
+  pub base_image:String,
   pub unshare_devsys: bool,
   pub unshare_groups: bool,
   pub unshare_ipc: bool,

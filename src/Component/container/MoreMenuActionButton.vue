@@ -1,5 +1,5 @@
 <script setup>
-import { pause_container, unpause_container } from '../../Functions/ContainerControles';
+import { pause_container, unpause_container, delete_container } from '../../Functions/ContainerControles';
 
 defineProps({
     containerId: { type: String }
@@ -30,7 +30,7 @@ defineProps({
 
             <v-list-item class="">
 
-                <v-btn text="Delete" color="#bd1919ff" rounded="lg" class="w-full"> </v-btn>
+                <v-btn text="Delete" color="#bd1919ff" rounded="lg" @Click="delete_container(containerId)" class="w-full"> </v-btn>
             </v-list-item>
             <v-list-item class="bg-transparent">
 

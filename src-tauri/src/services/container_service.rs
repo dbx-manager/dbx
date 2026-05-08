@@ -1,10 +1,12 @@
+use tauri::State;
+
+use crate::controllers::backup_controller::create_distrobox_container;
+use crate::controllers::containers_controller::delete_container as controller_delete_container;
 use crate::structs::container::{Container, ContainerList};
 use crate::structs::new_container_request::NewContainerRequest;
 use crate::structs::socket::PodmanSocket;
-use crate::controllers::distrobox_controller::create_distrobox_container;
 
 use std::{collections::HashMap};
-use tauri::State;
 
 #[tauri::command]
 pub async fn get_container_list(
@@ -32,6 +34,7 @@ pub async fn stop_container(id: String) -> Result<(), String> {
     if let Err(e) = podman.containers().get(id).stop(&Default::default()).await {
         eprintln!("{}", e);
     }
+   
     Ok(())
 }
 #[tauri::command]
@@ -50,5 +53,10 @@ pub async fn unpause_container(id: String) -> Result<(), String> {
     }
 
     Ok(())
+}
+
+#[tauri::command]
+pub async fn delete_container(id: String) -> Result<(), String> {
+    controller_delete_container(id).await
 }
 

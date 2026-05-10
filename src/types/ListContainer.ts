@@ -8,4 +8,12 @@ export interface Container {
   system_apps: string[];
   autobackup: boolean;
   autostart: boolean;
+  performance: Performance;
+}
+
+export interface Performance {
+  avg_cpu: number;
+  avg_memory: number;
+  perc_cpu: number;
+  perc_memory: number;
 }

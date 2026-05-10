@@ -33,11 +33,16 @@ export const ContainerListState = defineStore("ContainerListState", () => {
     refreshInterval.value = setInterval(async () => {
       fetchContainerList();
       matchConfigWithContainerList()
+      matchPerformanceWithContainerList()
     }, intervalDuration.value);
   }
 async function matchConfigWithContainerList(){
   
 await invoke("match_config_container")
+}
+async function matchPerformanceWithContainerList(){
+  
+await invoke("match_performance")
 }
   function stopAutoRefresh() {
     if (refreshInterval.value) {

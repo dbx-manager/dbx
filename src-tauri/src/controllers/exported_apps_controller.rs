@@ -31,6 +31,7 @@ pub async fn parse_distrobox_apps(dir: &Path, state: State<'_, ContainerList>) {
                                     system_apps: None,
                                     autobackup: None,
                                     autostart: None,
+                                    performance:None
                                 })
                                 .exported_apps
                                 .get_or_insert_with(Vec::new)

@@ -1,7 +1,7 @@
 use std::{collections::HashMap, sync::Arc};
 use tokio::sync::RwLock;
 
-use crate::controllers::containers_controller::self_fetch_data_async; // Use RwLock for interior mutability if you need to update data later
+use crate::{controllers::containers_controller::self_fetch_data_async, structs::performance::Performance}; // Use RwLock for interior mutability if you need to update data later
 
 #[derive(Clone)]
 pub struct ContainerList {
@@ -18,6 +18,7 @@ pub struct Container {
     pub system_apps: Option<Vec<String>>,
     pub autobackup: Option<bool>,
     pub autostart: Option<bool>,
+    pub performance: Option<Performance>
 }
 
 impl ContainerList {

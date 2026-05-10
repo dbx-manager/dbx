@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import "./assets/styles/style.css";
 import TopBar from "./Component/TopBar.vue";
+import { usePerformanceHistoryStore } from "./stores/performanceHistoryStore";
+
+const perfHistory = usePerformanceHistoryStore();
+perfHistory.start();
 </script>
 
 <template>

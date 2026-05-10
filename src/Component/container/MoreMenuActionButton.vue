@@ -16,7 +16,7 @@ defineProps({
 
         </template>
         <v-list rounded="lg"  density="compact" >
-            <v-list-item  class="">
+            <!-- <v-list-item  class="">
                 <v-btn text="Pause" color="#6c1882ff" rounded="lg" @Click="pause_container(containerId)" flat
                     class="w-full"></v-btn>
             </v-list-item>
@@ -25,7 +25,7 @@ defineProps({
                 <v-btn text="Unpause" color="#2a439aff" rounded="lg" @Click="unpause_container(containerId)" flat
                     class="w-full" />
 
-            </v-list-item>
+            </v-list-item> -->
 
 
             <v-list-item class="">

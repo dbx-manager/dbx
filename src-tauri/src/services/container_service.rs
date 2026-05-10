@@ -34,7 +34,6 @@ pub async fn stop_container(id: String) -> Result<(), String> {
     if let Err(e) = podman.containers().get(id).stop(&Default::default()).await {
         eprintln!("{}", e);
     }
-   
     Ok(())
 }
 #[tauri::command]

@@ -24,6 +24,8 @@ pub async fn self_fetch_data_async() -> HashMap<String, Container> {
                 system_apps: None,
                 autobackup: None,
                 autostart: None,
+                performance:None
+
             },
         );
     }
@@ -87,6 +89,7 @@ pub async fn start_container_monitoring(container_state: ContainerList) {
                         system_apps: None,
                         autobackup: None,
                         autostart: None,
+                        performance:None
                     },
                 );
             }

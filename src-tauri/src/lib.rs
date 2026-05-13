@@ -54,13 +54,15 @@ pub async fn run() {
             match_config_container,
             get_exported_apps,
             get_system_apps,
+            get_export_an_app_list,
             get_backup_config,
             update_backup_config,
             get_package_cache_size,
             get_backup_directory_list,
-            create_backup,
-            delete_backup,
-            restore_backup
+             create_backup,
+             delete_backup,
+             restore_backup,
+             export_an_app
          ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

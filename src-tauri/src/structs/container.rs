@@ -3,6 +3,12 @@ use tokio::sync::RwLock;
 
 use crate::{controllers::containers_controller::self_fetch_data_async, structs::performance::Performance}; // Use RwLock for interior mutability if you need to update data later
 
+#[derive(Clone, serde::Serialize, serde::Deserialize)]
+pub struct ExportableApp {
+    pub app_name: String,
+    pub sub_apps: Vec<String>,
+}
+
 #[derive(Clone)]
 pub struct ContainerList {
     // Wrap in Arc<RwLock> if you need thread-safe mutable access from commands
@@ -16,6 +22,7 @@ pub struct Container {
     pub state: Option<String>,
     pub exported_apps: Option<Vec<String>>,
     pub system_apps: Option<Vec<String>>,
+    pub exportable_apps: Option<Vec<ExportableApp>>,
     pub autobackup: Option<bool>,
     pub autostart: Option<bool>,
     pub performance: Option<Performance>

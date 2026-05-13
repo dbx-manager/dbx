@@ -12,7 +12,7 @@ const newContainerDialog = ref<boolean>(false);
 
 <template>
 
-    <v-container class="max-w-full! space-y-3">
+    <v-container class="max-w-full! space-y-3 px-0 sm:p-2" >
         <div class="w-full flex flex-col md:flex-row justify-between gap-4">
             <div class="flex-1">
 

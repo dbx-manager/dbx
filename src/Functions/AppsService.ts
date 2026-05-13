@@ -6,8 +6,13 @@ export async function get_exported_apps() {
 export async function get_system_apps(containerId: string){
   await invoke("get_system_apps", { containerId: containerId });
 }
+export async function get_export_an_app_list(containerId: string){
+  await invoke("get_export_an_app_list", { containerId: containerId });
+}
 
-
+export async function export_an_app(containerId: string,desktopFile:string){
+  await invoke("export_an_app", { containerId: containerId,appName:desktopFile });
+}
 export async function list_backups_for_container(containerId: string) {
   return await invoke("list_backups_for_container", { containerId });
 }

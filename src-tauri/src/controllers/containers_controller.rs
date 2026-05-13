@@ -22,6 +22,7 @@ pub async fn self_fetch_data_async() -> HashMap<String, Container> {
                 state: container.state,
                 exported_apps: None,
                 system_apps: None,
+                exportable_apps: None,
                 autobackup: None,
                 autostart: None,
                 performance:None
@@ -48,6 +49,7 @@ pub async fn fetch_containers_data() -> Vec<ListContainer> {
 
 // Delete a container by ID
 pub async fn delete_container(id: String) -> Result<(), String> {
+    //TODO remove using Distrobox cli or remove the exported apps first
     let podman = PodmanSocket::get_instance().await.socket.clone();
     podman.containers().get(&id).remove().await.map_err(|e| {
         eprintln!("Failed to delete container {}: {}", id, e);
@@ -79,19 +81,20 @@ pub async fn start_container_monitoring(container_state: ContainerList) {
                 existing.state = container.state;
             } else {
                 // Insert new container if it doesn't exist
-                data_lock.insert(
-                    key,
-                    Container {
-                        name:  Some(name),
-                        id: container.id,
-                        state: container.state,
-                        exported_apps: None,
-                        system_apps: None,
-                        autobackup: None,
-                        autostart: None,
-                        performance:None
-                    },
-                );
+                    data_lock.insert(
+                        key,
+                        Container {
+                            name:  Some(name),
+                            id: container.id,
+                            state: container.state,
+                            exported_apps: None,
+                            system_apps: None,
+                            exportable_apps: None,
+                            autobackup: None,
+                            autostart: None,
+                            performance:None
+                        },
+                    );
             }
         }
         

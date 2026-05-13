@@ -2,7 +2,7 @@ import { ref, onUnmounted } from "vue";
 import { Container } from "../types/ListContainer";
 import { defineStore } from "pinia";
 import { list_containers } from "../Functions/ListingContaienrs";
-import { get_exported_apps, get_system_apps } from "../Functions/AppsService";
+import { get_export_an_app_list, get_exported_apps, get_system_apps } from "../Functions/AppsService";
 import { invoke } from "@tauri-apps/api/core";
 import { useSettingsStore } from "./useSettingsStore";
 
@@ -27,6 +27,10 @@ export const ContainerListState = defineStore("ContainerListState", () => {
     //TODO add a error handiling
     (async () => await get_system_apps(containerId))();
   }
+function fetchExporteAnApp(containerId:string) {
+    //TODO add a error handiling
+    (async () => await get_export_an_app_list(containerId))();
+  }
 
   function startAutoRefresh() {
     stopAutoRefresh();
@@ -41,7 +45,6 @@ async function matchConfigWithContainerList(){
 await invoke("match_config_container")
 }
 async function matchPerformanceWithContainerList(){
-  
 await invoke("match_performance")
 }
   function stopAutoRefresh() {
@@ -68,6 +71,7 @@ await invoke("match_performance")
     settings,
     fetchExportedApps,
     fetchSystemApps,
+    fetchExporteAnApp,
     fetchContainerList,
     startAutoRefresh,
     stopAutoRefresh,

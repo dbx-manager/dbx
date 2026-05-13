@@ -29,6 +29,7 @@ pub async fn parse_distrobox_apps(dir: &Path, state: State<'_, ContainerList>) {
                                     state: None,
                                     exported_apps: None,
                                     system_apps: None,
+                                    exportable_apps: None,
                                     autobackup: None,
                                     autostart: None,
                                     performance:None
@@ -52,10 +53,6 @@ pub async fn parse_distrobox_apps(dir: &Path, state: State<'_, ContainerList>) {
         }
     }
 
-    // //write the changes to the container status
-    // let mut write_state: tokio::sync::RwLockWriteGuard<'_, HashMap<String, Container>> =
-    //     state.containers.write().await;
-    // *write_state = container_list;
 }
 
 fn extract_container_and_app(exec_line: &str) -> Option<(String, String)> {

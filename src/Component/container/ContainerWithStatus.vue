@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import "../../Functions/ListingContaienrs";
-import { onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted } from "vue";
 import MoreMenuActionButton from "./MoreMenuActionButton.vue";
 import { ContainerListState } from "../../stores/ContainerListState";
 import ContainerController from "./ContainerController.vue";
@@ -16,6 +16,7 @@ const perfHistory = usePerformanceHistoryStore()
 function getCpuData(containerId: string): number[][] {
   const data = perfHistory.getUplotData(containerId, true);
   if (!data) return [[], []];
+//   console.log(data[0])
   return [data[0], data[1]];
 }
 
@@ -69,7 +70,7 @@ function add_container_to_auto_start(event: Event,containerId:string) {
 
 <template>
     <v-container v-for="container in containerListState.containerList"
-        class="bg-[#333337] rounded-lg flex flex-row max-w-full! gap-1 pr-0">
+        class="bg-[#333337] rounded-lg flex flex-row max-w-full!  gap-1 pr-0 ">
         <div class="w-[20%]!" >
 
             <div class=" bg-transparent grid grid-cols-2 gap-1">
@@ -89,8 +90,6 @@ function add_container_to_auto_start(event: Event,containerId:string) {
 
 
         <div class="w-[80%] grid grid-cols-2 gap-2">
-            <!-- <div class="bg-[#212123ff] rounded-lg p-2 text-[12px]">CPU: {{ container.performance.perc_cpu }}</div> -->
-            <!-- <div class="bg-[#212123ff] rounded-lg p-2 text-[12px]">Mem: {{ container.performance.avg_memory }}</div> -->
             <div class="bg-[#1a1a1c] rounded-lg p-1">
                 <CpuLineChart :data="getCpuData(container.id)" :height="170" />
             </div>

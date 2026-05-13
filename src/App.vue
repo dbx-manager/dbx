@@ -10,7 +10,7 @@ perfHistory.start();
 <template>
   <v-app>
       <top-bar />
-    <v-container class="max-w-full!">
+    <v-container class="max-w-full! m-0 p-0! sm:p-3! md:p-5! ">
       <RouterView />
     </v-container>
   </v-app>

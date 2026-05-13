@@ -18,6 +18,7 @@ const opts: uPlot.Options = {
   legend: {
     isolate: true,
     live: true,
+    
   },
   cursor: {
     show: true,

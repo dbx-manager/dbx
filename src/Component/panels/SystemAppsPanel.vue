@@ -18,7 +18,7 @@ containerListState.fetchSystemApps(props.container_id);
         <!-- style used to set the grid settings in /src/assets/styles/style.css -->
         <v-virtual-scroll class="h-full!" v-if="systemAppList != null" :items="systemAppList">
             <template v-slot:default="{ item }">
-                <appholder :app-info="item" system-app-icon selection-box />
+                <appholder :app-info="item" system-app-icon selection-box :callback-function="()=>{}" />
             </template>
         </v-virtual-scroll>
     </div>

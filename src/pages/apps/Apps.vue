@@ -4,7 +4,7 @@ import "../../assets/styles/style.css";
 import AppsContainerCard from "../../Component/AppsContainerCard.vue";
 import { ContainerListState } from "../../stores/ContainerListState";
 
-const props = defineProps();
+defineProps();
 const containerListState = ContainerListState();
 containerListState.fetchExportedApps();
 

@@ -8,7 +8,7 @@ interface Props {
     autoBackupCallback: (e: Event, container_id: string) => void;
     autoStartCallback: (e: Event, container_id: string) => void;
 }
-const props = defineProps<Props>();
+defineProps<Props>();
 
 </script>
 

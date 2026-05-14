@@ -8,7 +8,7 @@ import { useSettingsStore } from "../../stores/useSettingsStore";
 import { usePerformanceHistoryStore } from "../../stores/performanceHistoryStore";
 import CpuLineChart from "../CpuLineChart.vue";
 import MemLineChart from "../MemLineChart.vue";
-const props = defineProps();
+defineProps();
 const containerListState = ContainerListState();
 const s = useSettingsStore()
 const perfHistory = usePerformanceHistoryStore()

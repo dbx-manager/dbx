@@ -6,7 +6,7 @@ import BackupContainerWithController from "../../Component/BackupContainerWithCo
 import { CronExp } from "../../utils/cronUtils";
 import { useSettingsStore } from "../../stores/useSettingsStore";
 
-const props = defineProps();
+defineProps();
 const settings = useSettingsStore();
 
 function syncCronWithBackend(cron_as_string: CronExp) {

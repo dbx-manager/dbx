@@ -5,7 +5,7 @@ import { onMounted } from "vue";
 import { invoke } from "@tauri-apps/api/core";
 import { delete_backup, postRestoreBackup } from "../Functions/BackupService";
 
-const props = defineProps();
+defineProps();
 const backup_files = ref<BackupFileList | null>(null);
 const loaded = ref<boolean>(false);
 const errorMessage = ref<string | null>(null)

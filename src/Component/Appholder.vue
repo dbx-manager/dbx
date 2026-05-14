@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import type { ExportableApp } from '../types/ListContainer';
 
 type AppInfoType = ExportableApp | string;
@@ -12,8 +11,7 @@ interface Props {
     callbackFunction: (appName:string)=>void;
     selected?: boolean;
 }
-
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
     selectionBox: false,
     iconUrl: "",
     systemAppIcon: false,

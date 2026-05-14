@@ -34,7 +34,7 @@ const allowedMonthes = (date:any) => {
     return day >= 1 && day <= 28;
 };
 
-const handleClickOutside = (event:PointerEvent) => {
+const handleClickOutside = (event:MouseEvent) => {
     if (
         pickerContainer.value &&
         !pickerContainer.value.contains(event.target)

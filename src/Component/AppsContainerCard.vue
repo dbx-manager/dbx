@@ -17,7 +17,7 @@ const switchToExportAnAppsPanel = () => (activePanel.value = "ExportAnAppPanel")
 interface Props {
     container: Container;
 }
-const props = defineProps<Props>();
+ defineProps<Props>();
 </script>
 <template>
     <ContainerCard :containerName="container.name">

@@ -20,7 +20,7 @@ pub struct Container {
     pub name: Option<String>,
     pub id: Option<String>,
     pub state: Option<String>,
-    pub exported_apps: Option<Vec<String>>,
+    pub exported_apps: Option<Vec<ExportableApp>>,
     pub system_apps: Option<Vec<String>>,
     pub exportable_apps: Option<Vec<ExportableApp>>,
     pub autobackup: Option<bool>,

@@ -9,7 +9,9 @@ export async function get_system_apps(containerId: string){
 export async function get_export_an_app_list(containerId: string){
   await invoke("get_export_an_app_list", { containerId: containerId });
 }
-
+export async function delete_an_exported_app(containerId: string,apps:Set<string>){
+  await invoke("delete_exported_an_app", { containerId: containerId,appNames:Array.from(apps) });
+}
 export async function export_an_app(containerId: string,desktopFile:string){
   await invoke("export_an_app", { containerId: containerId,appName:desktopFile });
 }

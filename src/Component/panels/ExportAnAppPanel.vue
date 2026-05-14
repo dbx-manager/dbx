@@ -23,7 +23,7 @@ containerListState.fetchExporteAnApp(props.container_id);
             <div class="flex justify-center h-fit!" v-for="app in app_list" :key="app.app_name">
 
                 <container-card  icon-url="-" :container-name="app.app_name"
-                     class="w-fit!  bg-[#38383bff]!">
+                     class="w-full bg-[#38383bff]!">
                     <ul class="p-2  flex-col gap-2  bg-[#1a1a1c] rounded-lg  " >
                         <li v-for="sub in app.sub_apps" :key="sub" class="  rounded-lg px-2 py-1 text-sm">
                             {{ sub }}

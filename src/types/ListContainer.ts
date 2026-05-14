@@ -9,7 +9,7 @@ export interface Container {
   name: string;
   id: string;
   state: string;
-  exported_apps: string[];
+  exported_apps: ExportableApp[];
   exportable_apps: ExportableApp[] | null;
   system_apps: string[];
   autobackup: boolean;

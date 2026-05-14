@@ -30,7 +30,7 @@ const isOpen = ref<boolean>(props.isOpen?? false);
                 isOpen ? "mdi-chevron-up" : "mdi-chevron-down"
             }}</v-icon>
         </div>
-        <div v-show="isOpen" class="cursor-auto" >
+        <div v-show="isOpen" class="cursor-auto pt-2" >
             <slot  />
         </div>
     </div>

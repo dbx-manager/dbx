@@ -1,7 +1,7 @@
 
 use std::path::Path;
 
-use crate::controllers::export_an_app_controller::{export_app_to_host, parse_container_exportable_apps};
+use crate::controllers::export_an_app_controller::{delete_exported_apps, export_app_to_host, parse_container_exportable_apps};
 use crate::controllers::exported_apps_controller::parse_distrobox_apps;
 use crate::controllers::system_apps_controller::parse_container_system_packages;
 use crate::structs::container::ContainerList;
@@ -40,4 +40,13 @@ pub async fn export_an_app(
     app_name: String,
 ) -> Result<bool, String> {
     export_app_to_host(container_id, app_name, state).await
+}
+
+#[tauri::command]
+pub async fn delete_exported_an_app(
+    state: State<'_, ContainerList>,
+    container_id: String,
+    app_names: Vec<String>,
+) -> Result<bool, String> {
+    delete_exported_apps(container_id, app_names, state).await
 }

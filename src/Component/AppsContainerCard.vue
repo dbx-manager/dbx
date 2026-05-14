@@ -43,7 +43,7 @@ const props = defineProps<Props>();
             <div class="py-2">
                 <div class="relative overflow-hidden rounded">
                     <ExportedAppsPanel class="overflow-scroll max-h-100" v-if="activePanel === 'ExportedAppsPanel'"
-                        :AppsList="container.exported_apps" />
+                        :contianer_id="container.id" :AppsList="container.exported_apps" />
                     <SystemAppsPanel class="overflow-scroll max-h-100" v-if="activePanel == 'SystemAppsPanel'"
                         :container_id="container.id" :systemAppList="container.system_apps" />
                     <ExportAnAppPanel class="overflow-scroll max-h-100" v-if="activePanel == 'ExportAnAppPanel'"
